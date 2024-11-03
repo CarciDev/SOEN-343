@@ -1,5 +1,4 @@
 import {} from "@prisma/client";
-import { prisma } from "../src/lib/db/client.ts";
 import { parseArgs } from "node:util";
 
 ///// TEST / PREVIEW SEED /////
