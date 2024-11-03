@@ -78,6 +78,7 @@
     "flowbite-svelte": "^0.44.24",
     "jsonwebtoken": "^9.0.2",
     "nodemailer": "^6.9.12",
+    "stripe": "^17.3.1",
     "ws": "^8.16.0",
     "zod": "^3.22.4"
   }
