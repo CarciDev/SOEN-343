@@ -39,7 +39,6 @@
     popup,
     storePopup,
     type PopupSettings,
-    modeCurrent,
   } from "@skeletonlabs/skeleton";
   import type { ModalComponent } from "@skeletonlabs/skeleton";
   import MobileNavigation from "$lib/components/MobileNavigation.svelte";
