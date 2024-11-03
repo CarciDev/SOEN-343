@@ -1,0 +1,23 @@
+enum TransactionType {
+  STRIPE
+  MANUAL
+}
+
+model ShipmentTransaction {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // This should be a longer randomly-generated string to be more 'realistic'
+  trackingNumber String    @unique
+  quotation      Quotation @relation(fields: [quotationId], references: [id])
+  quotationId    Int       @unique
+
+  transactionType   TransactionType
+  transactionDetail String? // eg. last 4 for Stripe
+
+  shipper   User @relation(fields: [shipperId], references: [id])
+  shipperId Int
+
+  trackingEvents TrackingEvent[]
+}

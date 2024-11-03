@@ -1,0 +1,14 @@
+model Box {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Units are centimetres and grams, no fractional values
+  // Grams should usually be converted to kg for display to the user
+  heightCm Int
+  widthCm  Int
+  depthCm  Int
+  weightG  Int
+
+  quotations Quotation[]
+}

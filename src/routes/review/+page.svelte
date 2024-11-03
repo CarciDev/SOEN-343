@@ -2,10 +2,6 @@
   import "../styles/review-form.css";
 
   import { createEventDispatcher } from "svelte";
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
   const dispatch = createEventDispatcher();
 
   let overallRating = 0;
@@ -18,10 +14,6 @@
   let feedback = { message: "", isError: false };
   let fileInput: HTMLInputElement;
 
-<<<<<<< Updated upstream
-  // Constants for file upload validation
-=======
->>>>>>> Stashed changes
   const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
   const MAX_FILES = 5;
   const ALLOWED_TYPES = ["image/jpeg", "image/png", "image/gif"];
@@ -30,46 +22,23 @@
     const target = event.target as HTMLInputElement;
     const files = Array.from(target.files || []);
 
-<<<<<<< Updated upstream
-    // Validate number of files
-=======
->>>>>>> Stashed changes
     if (files.length + images.length > MAX_FILES) {
       showFeedback(`You can only upload up to ${MAX_FILES} images`, true);
       return;
     }
 
-<<<<<<< Updated upstream
-    // Validate each file
     const validFiles = files.filter((file) => {
-      // Check file type
-=======
-    const validFiles = files.filter((file) => {
->>>>>>> Stashed changes
       if (!ALLOWED_TYPES.includes(file.type)) {
         showFeedback(`File "${file.name}" is not a supported image type`, true);
         return false;
       }
-<<<<<<< Updated upstream
-
-      // Check file size
-=======
->>>>>>> Stashed changes
       if (file.size > MAX_FILE_SIZE) {
         showFeedback(`File "${file.name}" exceeds 5MB size limit`, true);
         return false;
       }
-<<<<<<< Updated upstream
-
       return true;
     });
 
-    // Create preview URLs and add to images array
-=======
-      return true;
-    });
-
->>>>>>> Stashed changes
     validFiles.forEach((file) => {
       const reader = new FileReader();
       reader.onload = (e) => {
@@ -84,14 +53,7 @@
       reader.readAsDataURL(file);
     });
 
-<<<<<<< Updated upstream
-    // Update images array with new valid files
     images = [...images, ...validFiles];
-
-    // Clear the file input to allow uploading the same file again
-=======
-    images = [...images, ...validFiles];
->>>>>>> Stashed changes
     if (fileInput) fileInput.value = "";
   }
 

@@ -59,11 +59,17 @@ export const load = (async () => {
 }) satisfies ServerLoad;
 
 export const actions = {
-  createQuotation: async ({ request }) => {
+  createQuotation: async ({ request, locals }) => {
     const formData = await request.formData();
+    const userId = locals.user?.id;
+
+    // Check if userId is undefined
+    if (!userId) {
+      return fail(400, { message: "User is not authenticated" });
+    }
 
     try {
-      // Get coordinates for origin and destination
+      // Proceed with the quotation creation process as before
       const originCoords = await getCoordinates(
         formData.get("originAddress1") as string,
         formData.get("originCity") as string,
@@ -78,7 +84,6 @@ export const actions = {
         formData.get("destPostal") as string,
       );
 
-      // Create the box
       const box = await prisma.box.create({
         data: {
           depthCm: parseFloat(formData.get("depth") as string),
@@ -88,7 +93,6 @@ export const actions = {
         },
       });
 
-      // Create locations
       const origin = await prisma.earthLocation.create({
         data: {
           address1: formData.get("originAddress1") as string,
@@ -111,7 +115,6 @@ export const actions = {
         },
       });
 
-      // Calculate shipping cost
       const shippingCost = await calculateShippingCost(
         originCoords,
         destCoords,
@@ -123,13 +126,13 @@ export const actions = {
         },
       );
 
-      // Create the quotation
       const quotation = await prisma.quotation.create({
         data: {
           originId: origin.id,
           destinationId: destination.id,
           boxId: box.id,
           amountQuotedCents: shippingCost,
+          userId: userId, // userId is guaranteed to be a number here
         },
         include: {
           origin: true,
