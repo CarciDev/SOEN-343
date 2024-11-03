@@ -5,6 +5,7 @@ export class Quotation {
   originId: number;
   destinationId: number;
   amountQuotedCents: number;
+  etaDays: number;
   boxId: number;
 
   constructor(params: {
@@ -14,6 +15,7 @@ export class Quotation {
     originId: number;
     destinationId: number;
     amountQuotedCents: number;
+    etaDays: number;
     boxId: number;
   }) {
     this.id = params.id;
@@ -22,6 +24,7 @@ export class Quotation {
     this.originId = params.originId;
     this.destinationId = params.destinationId;
     this.amountQuotedCents = params.amountQuotedCents;
+    this.etaDays = params.etaDays;
     this.boxId = params.boxId;
   }
 }
