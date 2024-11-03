@@ -54,4 +54,21 @@ export class ShipmentTransactionRepository {
     if (dbResult) return await this.findById(dbResult.id);
     return null;
   }
+
+  static async findByShipperId(id: number): Promise<ShipmentTransaction[]> {
+    const dbResult = await prisma.shipmentTransaction.findMany({
+      select: { id: true },
+      where: { shipperId: id },
+    });
+    if (dbResult) {
+      const returnData: ShipmentTransaction[] = [];
+      for (const resultItem of dbResult) {
+        if (!resultItem.id) continue;
+        const shipmentTransaction = await this.findById(resultItem.id);
+        if (shipmentTransaction) returnData.push(shipmentTransaction);
+      }
+      return returnData;
+    }
+    return [];
+  }
 }
