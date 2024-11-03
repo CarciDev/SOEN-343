@@ -1,0 +1,19 @@
+model User {
+  id           Int      @id @default(autoincrement())
+  email        String   @unique
+  name         String
+  comment      String? // A note viewable/editable by the sysadmin only.
+  role         UserRole @default(CUSTOMER)
+  passwordHash String
+  disabled     Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  shipments ShipmentTransaction[]
+  reviews   Review[]
+}
+
+enum UserRole {
+  ADMIN
+  CUSTOMER
+}

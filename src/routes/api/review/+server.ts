@@ -1,11 +1,26 @@
 import { json, type RequestHandler } from "@sveltejs/kit";
 import { PrismaClient } from "@prisma/client";
+<<<<<<< Updated upstream
 import { parse } from "cookie";
 
 const prisma = new PrismaClient();
 
 export const POST: RequestHandler = async ({ request }) => {
   try {
+=======
+import { writeFileSync } from "fs";
+import { join } from "path";
+
+const prisma = new PrismaClient();
+
+export const POST: RequestHandler = async ({ request, locals }) => {
+  try {
+    const user = locals.user;
+    if (!user) {
+      return json({ error: "User not authenticated" }, { status: 401 });
+    }
+
+>>>>>>> Stashed changes
     const formData = await request.formData();
 
     // Required fields validation with proper typing
@@ -13,6 +28,7 @@ export const POST: RequestHandler = async ({ request }) => {
     const deliveryRating = Number(formData.get("deliveryRating"));
     const wasDeliveryOnTime = formData.get("wasDeliveryOnTime") === "true";
 
+<<<<<<< Updated upstream
     // Fetch user ID from cookies
     const cookies = request.headers.get("cookie");
     const parsedCookies = parse(cookies || "");
@@ -21,6 +37,8 @@ export const POST: RequestHandler = async ({ request }) => {
     const userId = Number(userIdStr);
     console.log("userId", userId);
 
+=======
+>>>>>>> Stashed changes
     // Validate required fields
     if (isNaN(rating) || rating < 1 || rating > 5) {
       return json(
@@ -36,6 +54,7 @@ export const POST: RequestHandler = async ({ request }) => {
       );
     }
 
+<<<<<<< Updated upstream
     if (isNaN(userId)) {
       return json({ error: "Invalid user ID" }, { status: 400 });
     }
@@ -44,13 +63,23 @@ export const POST: RequestHandler = async ({ request }) => {
     const comment = formData.get("comment")?.toString() || "";
 
     // Create the review with the schema-matching fields
+=======
+    // Optional comment field
+    const comment = formData.get("comment")?.toString() || "";
+
+    // Create the review with the schema-matching fields, using the user ID from locals
+>>>>>>> Stashed changes
     const review = await prisma.review.create({
       data: {
         rating,
         deliveryRating,
         wasDeliveryOnTime,
         comment,
+<<<<<<< Updated upstream
         userId,
+=======
+        userId: user.id, // Use user ID from event.locals
+>>>>>>> Stashed changes
       },
     });
 
