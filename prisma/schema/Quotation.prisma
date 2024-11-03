@@ -1,0 +1,15 @@
+model Quotation {
+  id            Int           @id @default(autoincrement())
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  origin        EarthLocation @relation("originId", fields: [originId], references: [id])
+  originId      Int
+  destination   EarthLocation @relation("destinationId", fields: [destinationId], references: [id])
+  destinationId Int
+
+  amountQuotedCents Int
+  box               Box @relation(fields: [boxId], references: [id])
+  boxId             Int
+
+  shipmentTransaction ShipmentTransaction?
+}

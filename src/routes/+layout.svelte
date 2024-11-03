@@ -9,8 +9,6 @@
     href: string;
     icon: typeof SvelteComponent;
   };
-
-  export const ssr = true;
 </script>
 
 <script lang="ts">

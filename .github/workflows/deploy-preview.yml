@@ -1,0 +1,155 @@
+name: Deploy Preview
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  deploy_preview:
+    permissions:
+      contents: read
+      statuses: write
+      pull-requests: write
+    runs-on: ubuntu-latest
+    environment: Preview
+    env:
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      SESSION_SIGNING_KEY: ${{ secrets.SESSION_SIGNING_KEY }}
+      EXEC_ENV: ${{ vars.EXEC_ENV }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: |
+          npm run build
+
+      - name: Get PR Branch Name
+        id: get_pull_request_branch_name
+        run: |
+          branch_name=${{ github.event.pull_request.head.ref }}
+          if [[ $branch_name == "develop" ]]; then
+            branch_name="preview/develop"
+          fi
+          echo "branch_name=${branch_name}" >> $GITHUB_OUTPUT
+          echo $branch_name
+
+      - name: Neon Database Create Branch Action
+        uses: neondatabase/create-branch-action@v3
+        id: create_branch
+        with:
+          project_id: ${{ secrets.NEON_PROJECT_ID }}
+          branch_name: ${{steps.get_pull_request_branch_name.outputs.branch_name}}
+          api_key: ${{ secrets.NEON_API_KEY }}
+          username: ${{ secrets.PG_USERNAME }}
+          password: ${{ secrets.PG_PASSWORD }}
+
+      - name: Set Database URL in .environment
+        run: |
+          echo "DATABASE_URL=${{ steps.create_branch.outputs.db_url_with_pooler}}/${{secrets.DATABASE_NAME}}?sslmode=require&pgbouncer=true" >> $GITHUB_ENV 
+          echo "DIRECT_DATABASE_URL=${{ steps.create_branch.outputs.db_url}}/${{secrets.DATABASE_NAME}}?sslmode=require" >> $GITHUB_ENV
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      # # BUG: On May 1st 2024, Vercel will no longer use secrets. See link for more info: https://vercel.com/changelog/legacy-environment-variable-secrets-are-being-sunset
+      # - name: Set Vercel Environment Variables
+      #   run: |
+      #     # If the variabes are already present in vercel, these command will fail, but we don't want to fail the build (Due to the `|| true` at the end of the command).
+      #     echo $DATABASE_URL | vercel env add DATABASE_URL preview ${{ github.head_ref }} --token $VERCEL_TOKEN || true
+      #     echo $DIRECT_DATABASE_URL | vercel env add DIRECT_DATABASE_URL preview ${{ github.head_ref }} --token $VERCEL_TOKEN || true
+
+      # - name: Pull Vercel Environment Information (Preview Specific)
+      #   run: vercel pull --yes --environment=preview --token=$VERCEL_TOKEN
+
+      # - name: Pull Vercel Environment Information (Branch Specific)
+      #   run:
+      #     vercel pull --yes --environment=preview
+      #     --git-branch=${{github.head_ref}} --token=$VERCEL_TOKEN
+
+      - name: Run Prisma Migrate
+        run: |
+          npx prisma migrate deploy
+
+      - name: Run Prisma Seed
+        run: |
+          npx prisma db seed -- --environment preview
+
+      - name: Extract branch name
+        id: extract_branch
+        shell: bash
+        run:
+          echo "branch=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >>
+          $GITHUB_OUTPUT
+
+      - name: Hash branch name
+        uses: pplanel/hash-calculator-action@v1.3.1
+        id: hash_branch
+        with:
+          input: ${{ steps.extract_branch.outputs.branch }}
+          method: MD5
+
+      - name: Lint
+        run: |
+          npm run lint
+          npm run prisma:validate
+
+      - name: Test
+        run: |
+          npm run test
+
+      - name: Deploy Project Artifacts to Vercel
+        id: vercel
+        env:
+          META_TAG:
+            ${{ steps.hash_branch.outputs.digest }}-${{ github.run_number }}-${{
+            github.run_attempt}}
+        run: |
+          vercel --version
+          vercel pull --yes --environment=preview --git-branch=${{github.head_ref}} --token=$VERCEL_TOKEN
+          vercel build --token=$VERCEL_TOKEN
+          vercel deploy --prebuilt --archive=tgz --token=$VERCEL_TOKEN --meta base_hash=${{ env.META_TAG }} --env DATABASE_URL=$DATABASE_URL --env DIRECT_DATABASE_URL=$DIRECT_DATABASE_URL --env SESSION_SIGNING_KEY=$SESSION_SIGNING_KEY --env EXEC_ENV=$EXEC_ENV --env SMTP_HOST=${{secrets.SMTP_HOST}} --env SMTP_PORT=${{secrets.SMTP_PORT}} --env SMTP_USER=${{secrets.SMTP_USER}} --env SMTP_PASS=${{secrets.SMTP_PASS}} --env BLOB_CLOUDFRONT_DIST=${{vars.BLOB_CLOUDFRONT_DIST}} --env BLOB_S3_BUCKET=${{vars.BLOB_S3_BUCKET}} --env BLOB_S3_REGION=${{vars.BLOB_S3_REGION}} --env AWS_ACCESS_KEY_ID=${{secrets.AWS_ACCESS_KEY_ID}} --env AWS_SECRET_ACCESS_KEY=${{secrets.AWS_SECRET_ACCESS_KEY}}
+
+          vercel ls --token=$VERCEL_TOKEN --meta base_hash=${{ env.META_TAG }} &> vercel-output
+          url=$(cat vercel-output | grep http | awk '{print $2}')
+          echo "New preview URL: $url"
+          echo "META_TAG=$META_TAG"
+          echo "preview_url=$url" >> "$GITHUB_OUTPUT"
+
+      # From: https://github.com/peter-evans/create-or-update-comment
+      - name: Find Comment
+        uses: peter-evans/find-comment@v1
+        id: previewComment
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          comment-author: "github-actions[bot]"
+          body-includes: Vercel Preview URL
+
+      - name: Create comment
+        if: steps.previewComment.outputs.comment-id == ''
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            Vercel Preview URL :rocket: : ${{ steps.vercel.outputs.preview_url }}
+            Neon branch :elephant: : https://console.neon.tech/app/projects/${{ secrets.NEON_PROJECT_ID }}/branches/${{ steps.create_branch.outputs.branch_id }}
+
+      - name: Update comment
+        if: steps.previewComment.outputs.comment-id != ''
+        uses: peter-evans/create-or-update-comment@v1
+        with:
+          comment-id: ${{ steps.previewComment.outputs.comment-id }}
+          body: |
+            Vercel Preview URL :rocket: : ${{ steps.vercel.outputs.preview_url }}
+            Neon branch :elephant: : https://console.neon.tech/app/projects/${{ secrets.NEON_PROJECT_ID }}/branches/${{ steps.create_branch.outputs.branch_id }}
+          edit-mode: replace

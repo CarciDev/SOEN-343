@@ -1,5 +1,6 @@
 docker-data/
 .svelte-kit/
+.vercel/
 
 # Created by https://www.toptal.com/developers/gitignore/api/sublime,vscode,macos,windows,node,docker
 # Edit at https://www.toptal.com/developers/gitignore?templates=sublime,vscode,macos,windows,node,docker
