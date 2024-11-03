@@ -1,0 +1,54 @@
+name: Deploy Develop
+
+on:
+  push:
+    branches:
+      - "develop"
+
+jobs:
+  deploy_develop:
+    permissions: write-all
+    runs-on: ubuntu-latest
+    environment: Develop
+    env:
+      VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+      VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
+      DIRECT_DATABASE_URL: ${{ secrets.DIRECT_DATABASE_URL }}
+      SESSION_SIGNING_KEY: ${{ secrets.SESSION_SIGNING_KEY }}
+      EXEC_ENV: ${{ vars.EXEC_ENV }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Prisma Migrate
+        run: |
+          npx prisma migrate deploy
+
+      # Seed the develop database with the seedMain script. We do this to mimic the production database
+      - name: Run Prisma SeedMain
+        run: |
+          npx prisma db seed -- --environment develop
+
+      - name: Install Vercel CLI
+        run: npm install --global vercel@latest
+
+      - name: Pull Vercel Environment Information
+        run: |
+          vercel pull --yes --environment=preview --git-branch=develop --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Build Project Artifacts
+        run: vercel build --token=${{ secrets.VERCEL_TOKEN }}
+
+      - name: Deploy Project Artifacts to Vercel
+        run: |
+          url="$(vercel deploy --prebuilt --token=${{ secrets.VERCEL_TOKEN }} --env DATABASE_URL=$DATABASE_URL --env DIRECT_DATABASE_URL=$DIRECT_DATABASE_URL --env SESSION_SIGNING_KEY=$SESSION_SIGNING_KEY --env EXEC_ENV=$EXEC_ENV)"
+          vercel alias --token=${{ secrets.VERCEL_TOKEN }} set "$url" ${{vars.DEVELOP_DOMAIN}}
