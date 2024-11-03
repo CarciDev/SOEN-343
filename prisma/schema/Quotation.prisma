@@ -8,6 +8,8 @@ model Quotation {
   destinationId Int
 
   amountQuotedCents Int
+  // ETA = first tracking event (picked up at origin) + this many days
+  etaDays           Int @default(2)
   box               Box @relation(fields: [boxId], references: [id])
   boxId             Int
 

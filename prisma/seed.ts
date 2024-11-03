@@ -1,12 +1,11 @@
 import { TrackingStatus, TransactionType, UserRole } from "@prisma/client";
 import { prisma } from "../src/lib/db/client.ts";
-import { parseArgs } from "node:util";
 import bcrypt from "bcrypt";
 
 ///// TEST / PREVIEW SEED /////
 
 async function seedAll() {
-  let admin = await prisma.user.upsert({
+  await prisma.user.upsert({
     where: { id: 1 },
     update: {},
     create: {
@@ -19,7 +18,7 @@ async function seedAll() {
     },
   });
 
-  let customer = await prisma.user.upsert({
+  const customer = await prisma.user.upsert({
     where: { id: 2 },
     update: {},
     create: {
@@ -32,7 +31,7 @@ async function seedAll() {
     },
   });
 
-  let box = await prisma.box.upsert({
+  const box = await prisma.box.upsert({
     where: { id: 1 },
     update: {},
     create: {
@@ -44,7 +43,7 @@ async function seedAll() {
     },
   });
 
-  let concordia = await prisma.earthLocation.upsert({
+  const concordia = await prisma.earthLocation.upsert({
     where: { id: 1 },
     update: {},
     create: {
@@ -59,7 +58,7 @@ async function seedAll() {
     },
   });
 
-  let loyola = await prisma.earthLocation.upsert({
+  const loyola = await prisma.earthLocation.upsert({
     where: { id: 2 },
     update: {},
     create: {
@@ -74,7 +73,7 @@ async function seedAll() {
     },
   });
 
-  let quote = await prisma.quotation.upsert({
+  const quote = await prisma.quotation.upsert({
     where: { id: 1 },
     update: {},
     create: {
@@ -86,7 +85,7 @@ async function seedAll() {
     },
   });
 
-  let shipment = await prisma.shipmentTransaction.upsert({
+  const shipment = await prisma.shipmentTransaction.upsert({
     where: { id: 1 },
     update: {},
     create: {
@@ -99,7 +98,7 @@ async function seedAll() {
     },
   });
 
-  let pickup = await prisma.trackingEvent.upsert({
+  await prisma.trackingEvent.upsert({
     where: { id: 1 },
     update: {},
     create: {
