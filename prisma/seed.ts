@@ -5,7 +5,7 @@ import bcrypt from "bcrypt";
 ///// TEST / PREVIEW SEED /////
 
 async function seedAll() {
-  const admin = await prisma.user.upsert({
+  await prisma.user.upsert({
     where: { id: 1 },
     update: {},
     create: {
@@ -98,7 +98,7 @@ async function seedAll() {
     },
   });
 
-  const pickup = await prisma.trackingEvent.upsert({
+  await prisma.trackingEvent.upsert({
     where: { id: 1 },
     update: {},
     create: {
