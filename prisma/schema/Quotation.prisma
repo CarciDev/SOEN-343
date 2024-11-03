@@ -11,7 +11,4 @@ model Quotation {
   box                 Box                  @relation(fields: [boxId], references: [id])
   boxId               Int
   shipmentTransaction ShipmentTransaction?
-
-  User   User? @relation(fields: [userId], references: [id])
-  userId Int?
 }
