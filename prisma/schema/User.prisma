@@ -10,25 +10,7 @@ model User {
   updatedAt    DateTime @updatedAt
 
   shipments ShipmentTransaction[]
-}
-
-model Review {
-  id                Int      @id @default(autoincrement())
-  rating            Int
-  deliveryRating    Int
-  wasDeliveryOnTime Boolean
-  comment           String?
-  userId            Int
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  images            Image[]
-}
-
-model Image {
-  id       Int    @id @default(autoincrement())
-  url      String
-  reviewId Int
-  review   Review @relation(fields: [reviewId], references: [id])
+  reviews   Review[]
 }
 
 enum UserRole {
