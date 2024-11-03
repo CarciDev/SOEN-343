@@ -9,9 +9,8 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  shipments  ShipmentTransaction[]
-  reviews    Review[]
-  quotations Quotation[]
+  shipments ShipmentTransaction[]
+  reviews   Review[]
 }
 
 enum UserRole {
