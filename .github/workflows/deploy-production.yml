@@ -38,10 +38,14 @@ jobs:
       - name: Install Vercel CLI
         run: npm install --global vercel@latest
 
+      - name: Link Vercel project
+        run:
+          vercel link --yes --project svelteship -t ${{ secrets.VERCEL_TOKEN }}
+
       - name: Pull Vercel Environment Information
         run:
           vercel pull -t ${{ secrets.VERCEL_TOKEN }} --environment=production
-          --yes --scope brian-tkatchs-projects
+          --yes
 
       - name: Build Project Artifacts
         run: vercel build --prod -t ${{ secrets.VERCEL_TOKEN }}
