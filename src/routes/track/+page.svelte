@@ -1,5 +1,6 @@
 <script lang="ts">
   import MagnifyingGlass from "$lib/icons/MagnifyingGlass.svelte";
+  import { formatDbReservationDate } from "$lib/utils.js";
 
   export let data;
 </script>
@@ -35,11 +36,17 @@
         <tbody>
           {#each data.overview as item}
             <tr>
-              <td>{item.trackingNumber}</td>
-              <td>{item.eta ? item.eta.toLocaleDateString() : ""}</td>
+              <td>
+                <a href="/track/{item.trackingNumber}" class="underline">
+                  {item.trackingNumber}
+                </a>
+              </td>
+              <td>{item.eta ? formatDbReservationDate(item.eta) : ""}</td>
               <td
                 >{item.lastUpdated
-                  ? item.lastUpdated.toLocaleString()
+                  ? formatDbReservationDate(item.lastUpdated) +
+                    ", " +
+                    item.lastUpdated.toLocaleTimeString()
                   : ""}</td>
               <td>{item.status}</td>
             </tr>
