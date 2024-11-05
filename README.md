@@ -256,6 +256,14 @@ environment variable.
 Much like the having a terminal dedicated for running the Docker container or
 the development server, you'll have one running for to forward Stripe webhooks.
 
+#### Test Mode
+
+Finally, please have a look through the Stripe docs for test mode:
+https://docs.stripe.com/test-mode. A key takeaway is that the test card number
+for Visa credit card is "4242424242424242", with a CVC if any 3 digits and a
+date with any future data. This test card will be useful for developers in
+simulating a successful payment scenario.
+
 ### Before Merging
 
 Before you created a merge request, make sure that your code is properly
