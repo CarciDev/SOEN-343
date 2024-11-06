@@ -86,6 +86,30 @@ async function seedAll() {
     },
   });
 
+  let quote2 = await prisma.quotation.upsert({
+    where: { id: 2 },
+    update: {},
+    create: {
+      id: 2,
+      originId: concordia.id,
+      destinationId: loyola.id,
+      amountQuotedCents: 2000,
+      boxId: box.id,
+    },
+  });
+
+  let quote3 = await prisma.quotation.upsert({
+    where: { id: 2 },
+    update: {},
+    create: {
+      id: 3,
+      originId: concordia.id,
+      destinationId: loyola.id,
+      amountQuotedCents: 2000,
+      boxId: box.id,
+    },
+  });
+
   let shipment = await prisma.shipmentTransaction.upsert({
     where: { id: 1 },
     update: {},
