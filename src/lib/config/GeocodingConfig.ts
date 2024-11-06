@@ -1,6 +1,5 @@
 import {
   GeocodingService,
-  CachedGeocodingService,
 } from "$lib/services/geocoding";
 import { dev } from "$app/environment";
 
@@ -23,6 +22,6 @@ const config = {
 } as const;
 
 // Export the configured service
-export const geocodingService = dev
-  ? new GeocodingService(config.development)
-  : new CachedGeocodingService(config.production);
+export const geocodingService = new GeocodingService(
+  dev ? config.development : config.production
+);

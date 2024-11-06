@@ -18,6 +18,6 @@ export interface PageServerLoad {
   }>;
 }
 
-export interface PageData {
-  quotations: QuotationWithRelations[];
-}
+export type PageData = {
+  lastQuotation: QuotationWithRelations | null;
+};

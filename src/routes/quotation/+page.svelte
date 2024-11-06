@@ -8,6 +8,7 @@
   let showForm = false;
   let error: { message: string; field?: string } | null = null;
   let loading = false;
+  let lastQuotation = data.lastQuotation;
 
   function formatAmount(cents: number): string {
     return (cents / 100).toLocaleString("en-US", {
@@ -34,13 +35,12 @@
       } else if (result.type === "success") {
         error = null;
         showForm = false;
+        lastQuotation = result.data.quotation;
         await invalidateAll();
       }
       await update();
     };
   }
-
-  $: quotations = data.quotations;
 </script>
 
 <div class="container mx-auto p-4">
@@ -254,6 +254,41 @@
           </button>
         </div>
       </form>
+    </div>
+  {/if}
+
+  <!-- Display the last quotation made using the form -->
+  {#if lastQuotation}
+    <div class="mt-6">
+      <h2 class="text-xl font-bold">Last Quotation</h2>
+      <table class="w-full border-collapse border border-gray-300 mt-4">
+        <thead>
+          <tr>
+            <th class="border border-gray-300 p-2">Origin</th>
+            <th class="border border-gray-300 p-2">Destination</th>
+            <th class="border border-gray-300 p-2">Dimensions</th>
+            <th class="border border-gray-300 p-2">Weight</th>
+            <th class="border border-gray-300 p-2">Cost</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="border border-gray-300 p-2">
+              {lastQuotation.origin.city}, {lastQuotation.origin.countryCode}
+            </td>
+            <td class="border border-gray-300 p-2">
+              {lastQuotation.destination.city}, {lastQuotation.destination.countryCode}
+            </td>
+            <td class="border border-gray-300 p-2">
+              {lastQuotation.box.widthCm} x {lastQuotation.box.widthCm} x {lastQuotation.box.heightCm} cm
+            </td>
+            <td class="border border-gray-300 p-2">{lastQuotation.box.weightG} g</td>
+            <td class="border border-gray-300 p-2">
+              {formatAmount(lastQuotation.amountQuotedCents)}
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   {/if}
 </div>

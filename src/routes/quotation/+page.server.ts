@@ -1,7 +1,7 @@
+
 import { PrismaClient } from "@prisma/client";
 import { fail, type Actions } from "@sveltejs/kit";
 import type { ServerLoad } from "@sveltejs/kit";
-import type { QuotationWithRelations } from "$lib/types";
 import { geocodingService } from "$lib/config/GeocodingConfig";
 import { _calculatePrice } from "../api/pricing/+server";
 
@@ -86,8 +86,8 @@ export const actions = {
             height: parseFloat(formData.get("height") as string),
             weight: parseFloat(formData.get("weight") as string),
           },
-          originResult.countryCode,
-          destResult.countryCode,
+          originResult.countryCode as string,
+          destResult.countryCode as string,
         );
 
         const quotation = await prisma.quotation.create({
@@ -126,26 +126,21 @@ export const actions = {
   },
 } satisfies Actions;
 
-
 export const load = (async () => {
-  try {
-    const quotations = await prisma.quotation.findMany({
-      include: {
-        origin: true,
-        destination: true,
-        box: true,
-        shipmentTransaction: true,
-      },
-    });
-    return {
-      quotations: quotations as QuotationWithRelations[],
-    };
-  } catch (error) {
-    console.error("Error loading quotations:", error);
-    return {
-      quotations: [] as QuotationWithRelations[],
-    };
-  }
+  // Get the last quotation made
+  const lastQuotation = await prisma.quotation.findFirst({
+    orderBy: {
+      createdAt: "desc",
+    },
+    include: {
+      origin: true,
+      destination: true,
+      box: true,
+      shipmentTransaction: true,
+    },
+  });
+
+  return {
+    lastQuotation
+  };
 }) satisfies ServerLoad;
-
-

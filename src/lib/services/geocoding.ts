@@ -12,6 +12,7 @@ interface GeocodingResult {
   valid: boolean;
   displayName?: string;
   error?: string;
+  countryCode?: string;
 }
 
 const lastRequestTime: { [key: string]: number } = {};
@@ -131,4 +132,3 @@ export class GeocodingService {
     }
   }
 }
-
