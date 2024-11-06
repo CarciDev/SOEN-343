@@ -3,6 +3,7 @@ import { fail, type Actions } from "@sveltejs/kit";
 import type { ServerLoad } from "@sveltejs/kit";
 import type { QuotationWithRelations } from "$lib/types";
 import { geocodingService } from "$lib/config/GeocodingConfig";
+import { _calculatePrice } from "../api/pricing/+server";
 
 const prisma = new PrismaClient();
 
@@ -76,7 +77,7 @@ export const actions = {
           },
         });
 
-        const shippingCost = await calculateShippingCost(
+        const shippingCost = await _calculatePrice(
           { lat: originResult.lat, lng: originResult.lng },
           { lat: destResult.lat, lng: destResult.lng },
           {
@@ -85,6 +86,8 @@ export const actions = {
             height: parseFloat(formData.get("height") as string),
             weight: parseFloat(formData.get("weight") as string),
           },
+          originResult.countryCode,
+          destResult.countryCode,
         );
 
         const quotation = await prisma.quotation.create({
@@ -123,31 +126,6 @@ export const actions = {
   },
 } satisfies Actions;
 
-async function calculateShippingCost(
-  originCoords: { lat: number; lng: number },
-  destCoords: { lat: number; lng: number },
-  dimensions: { length: number; width: number; height: number; weight: number },
-) {
-  const baseRate = 1000; // $10.00 base rate
-  const volumeMultiplier = 0.01;
-  const weightMultiplier = 100;
-  //Calculate distance between origin and destination
-  const distance = calculateDistance(
-    originCoords.lat,
-    originCoords.lng,
-    destCoords.lat,
-    destCoords.lng,
-  );
-  //Calculate cost based on distance
-  const distanceCost = distance * 0.1; // $0.10 per kilometer
-  //Calculate cost based on volume and weight
-  const volume = dimensions.length * dimensions.width * dimensions.height;
-  const volumeCost = volume * volumeMultiplier;
-  const weightCost = dimensions.weight * weightMultiplier;
-  //Calculate total cost
-  const totalCost = baseRate + distanceCost + volumeCost + weightCost;
-  return totalCost;
-}
 
 export const load = (async () => {
   try {
@@ -170,25 +148,4 @@ export const load = (async () => {
   }
 }) satisfies ServerLoad;
 
-function calculateDistance(
-  lat1: number,
-  lon1: number,
-  lat2: number,
-  lon2: number,
-): number {
-  const toRadians = (degrees: number) => degrees * (Math.PI / 180);
 
-  const R = 6371; // Radius of the Earth in kilometers
-  const dLat = toRadians(lat2 - lat1);
-  const dLon = toRadians(lon2 - lon1);
-  const a =
-    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-    Math.cos(toRadians(lat1)) *
-      Math.cos(toRadians(lat2)) *
-      Math.sin(dLon / 2) *
-      Math.sin(dLon / 2);
-  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-  const distance = R * c; // Distance in kilometers
-
-  return distance;
-}

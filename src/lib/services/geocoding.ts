@@ -104,54 +104,31 @@ export class GeocodingService {
       };
     }
   }
+  //distance between 2 coordinates
+  async calculateDistance(
+    lat1: number,
+    lng1: number,
+    lat2: number,
+    lng2: number
+  ): Promise<number> {
+    try {
+      const R = 6371e3; // metres
+      const φ1 = (lat1 * Math.PI) / 180; // φ, λ in radians
+      const φ2 = (lat2 * Math.PI) / 180;
+      const Δφ = ((lat2 - lat1) * Math.PI) / 180;
+      const Δλ = ((lng2 - lng1) * Math.PI) / 180;
+
+      const a =
+        Math.sin(Δφ / 2) * Math.sin(Δφ / 2) +
+        Math.cos(φ1) * Math.cos(φ2) * Math.sin(Δλ / 2) * Math.sin(Δλ / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+      const distance = R * c; // in metres
+      return distance;
+    } catch (error) {
+      console.error("Error calculating distance:", error);
+      return 0;
+    }
+  }
 }
 
-// Cache implementation for production use
-export class CachedGeocodingService extends GeocodingService {
-  private cache: Map<string, GeocodingResult>;
-  private readonly cacheSize: number;
-
-  constructor(config?: Partial<GeocodingConfig>, cacheSize: number = 1000) {
-    super(config);
-    this.cache = new Map();
-    this.cacheSize = cacheSize;
-  }
-
-  private getCacheKey(
-    address: string,
-    city: string,
-    country: string,
-    postalCode: string,
-  ): string {
-    return `${address}|${city}|${country}|${postalCode}`.toLowerCase();
-  }
-
-  private pruneCache(): void {
-    if (this.cache.size > this.cacheSize) {
-      const keysToDelete = Array.from(this.cache.keys()).slice(0, 100);
-      keysToDelete.forEach((key) => this.cache.delete(key));
-    }
-  }
-
-  async geocode(
-    address: string,
-    city: string,
-    country: string,
-    postalCode: string,
-  ): Promise<GeocodingResult> {
-    const cacheKey = this.getCacheKey(address, city, country, postalCode);
-
-    if (this.cache.has(cacheKey)) {
-      return this.cache.get(cacheKey)!;
-    }
-
-    const result = await super.geocode(address, city, country, postalCode);
-
-    if (result.valid) {
-      this.cache.set(cacheKey, result);
-      this.pruneCache();
-    }
-
-    return result;
-  }
-}

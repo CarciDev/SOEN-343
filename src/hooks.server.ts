@@ -7,6 +7,7 @@ const openRoutes = [
   "/auth/login",
   "/auth/logout",
   "/auth/register",
+  "/quotation",
 ]; // Routes that don't need the user to be logged in
 
 export const handle: Handle = async ({ event, resolve }) => {
