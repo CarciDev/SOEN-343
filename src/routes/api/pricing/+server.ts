@@ -26,7 +26,7 @@ export async function _calculatePrice(
   const volumeFee = volume > 100000 ? volumeMultiplier * volume : 0;
   //if box is too heavy, add additional fee
   const weightFee = dimensions.weight > 100 ? weightMultiplier * dimensions.weight : 0;
-  //calculate total cost (this formula is fucked)
+  //calculate total cost
   const totalCost = baseRate + internationalFee + volumeFee + weightFee;
   return totalCost;
 }

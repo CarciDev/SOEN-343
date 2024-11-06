@@ -15,7 +15,7 @@ services.
 | Giuliano Verdone | 40252190   |
 | Brian Tkatch     | 40191139   |
 | Jeremy Vieira    | 40246737   |
-| Laurenz Gomez    | 40252190   |
+| Laurenz Gomez    | 40247966   |
 | David Carciente  | 40247907   |
 | Nirav Patel      | 40248940   |
 
