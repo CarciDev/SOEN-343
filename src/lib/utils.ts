@@ -48,3 +48,19 @@ export function formatDateToYYYYMMDD(date: Date): string {
 
   return `${year}-${month}-${day}`;
 }
+
+/**
+ * Converts an ArrayBuffer to a Node.js Buffer.
+ * 
+ * @param {ArrayBuffer} ab - The ArrayBuffer to convert.
+ * @returns {Buffer} - A new Buffer containing the same data as the ArrayBuffer.
+ */
+export function toBuffer(ab: ArrayBuffer): Buffer {
+  const buf = Buffer.alloc(ab.byteLength);
+  const view = new Uint8Array(ab); // Create an array view over the ArrayBuffer to access its data
+  for (let i = 0; i < buf.length; i++) { 
+    buf[i] = view[i];
+  } // Copy each byte to the Buffer
+  return buf;
+}
+
