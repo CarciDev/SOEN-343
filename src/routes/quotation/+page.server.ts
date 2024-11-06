@@ -128,17 +128,25 @@ async function calculateShippingCost(
   destCoords: { lat: number; lng: number },
   dimensions: { length: number; width: number; height: number; weight: number },
 ) {
-  // In a real application, you would calculate this based on distance, weight, and dimensions
-  // For this example, we'll use a simple calculation
   const baseRate = 1000; // $10.00 base rate
   const volumeMultiplier = 0.01;
   const weightMultiplier = 100;
-
+  //Calculate distance between origin and destination
+  const distance = calculateDistance(
+    originCoords.lat,
+    originCoords.lng,
+    destCoords.lat,
+    destCoords.lng,
+  );
+  //Calculate cost based on distance
+  const distanceCost = distance * 0.1; // $0.10 per kilometer
+  //Calculate cost based on volume and weight
   const volume = dimensions.length * dimensions.width * dimensions.height;
   const volumeCost = volume * volumeMultiplier;
   const weightCost = dimensions.weight * weightMultiplier;
-
-  return Math.round(baseRate + volumeCost + weightCost);
+  //Calculate total cost
+  const totalCost = baseRate + distanceCost + volumeCost + weightCost;
+  return totalCost;
 }
 
 export const load = (async () => {
@@ -161,3 +169,26 @@ export const load = (async () => {
     };
   }
 }) satisfies ServerLoad;
+
+function calculateDistance(
+  lat1: number,
+  lon1: number,
+  lat2: number,
+  lon2: number,
+): number {
+  const toRadians = (degrees: number) => degrees * (Math.PI / 180);
+
+  const R = 6371; // Radius of the Earth in kilometers
+  const dLat = toRadians(lat2 - lat1);
+  const dLon = toRadians(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(toRadians(lat1)) *
+      Math.cos(toRadians(lat2)) *
+      Math.sin(dLon / 2) *
+      Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const distance = R * c; // Distance in kilometers
+
+  return distance;
+}
