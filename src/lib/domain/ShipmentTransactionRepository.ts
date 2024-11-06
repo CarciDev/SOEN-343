@@ -3,6 +3,15 @@ import { ShipmentTransaction } from "./ShipmentTransaction";
 
 export class ShipmentTransactionRepository {
   static async save(shipmentTransaction: ShipmentTransaction) {
+
+    const quotationExists = await prisma.quotation.findUnique({
+      where: { id: shipmentTransaction.quotationId },
+    });
+
+    if (!quotationExists) {
+      throw new Error(`Quotation with id ${shipmentTransaction.quotationId} does not exist.`);
+    }
+
     const dataFields = {
       trackingNumber: shipmentTransaction.trackingNumber,
       quotationId: shipmentTransaction.quotationId,
@@ -12,7 +21,9 @@ export class ShipmentTransactionRepository {
     };
 
     const savedTransaction = await prisma.shipmentTransaction.upsert({
-      where: { id: shipmentTransaction.id },
+      where: {
+        trackingNumber: shipmentTransaction.trackingNumber || undefined,
+      }, // originally where: { id: shipmentTransaction.id },
       update: dataFields,
       create: dataFields,
     });
