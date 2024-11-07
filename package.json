@@ -16,7 +16,8 @@
     "typecheck": "tsc --noEmit",
     "postinstall": "prisma generate",
     "prepare": "husky install",
-    "pre-commit": "lint-staged && npm test"
+    "pre-commit": "lint-staged && npm test",
+    "stripe:webhooks": "stripe listen --forward-to localhost:5173/api/stripe/webhook"
   },
   "prisma": {
     "seed": "tsx prisma/seed.ts"
@@ -49,6 +50,7 @@
     "prettier-plugin-svelte": "^3.1.2",
     "prettier-plugin-tailwindcss": "^0.5.9",
     "prisma": "^5.21.1",
+    "stripe-event-types": "^3.1.0",
     "svelte": "^4.2.7",
     "svelte-check": "^3.6.0",
     "tailwindcss": "^3.3.6",
@@ -78,6 +80,7 @@
     "flowbite-svelte": "^0.44.24",
     "jsonwebtoken": "^9.0.2",
     "nodemailer": "^6.9.12",
+    "stripe": "^17.3.1",
     "ws": "^8.16.0",
     "zod": "^3.22.4"
   }

@@ -1,6 +1,6 @@
 import type { ToastSettings } from "@skeletonlabs/skeleton";
 
-export function newErrorToats(
+export function newErrorToast(
   message: string,
   classes?: string,
 ): ToastSettings {
@@ -12,7 +12,7 @@ export function newErrorToats(
   };
 }
 
-export function newSuccessToats(
+export function newSuccessToast(
   message: string,
   classes?: string,
 ): ToastSettings {

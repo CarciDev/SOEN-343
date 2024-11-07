@@ -10,7 +10,8 @@
     "sourceMap": true,
     "strict": true,
     "moduleResolution": "bundler",
-    "noImplicitAny": true
+    "noImplicitAny": true,
+    "types": ["stripe-event-types"]
   }
   // Path aliases are handled by https://kit.svelte.dev/docs/configuration#alias
   //
