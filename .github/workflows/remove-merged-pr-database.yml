@@ -1,0 +1,47 @@
+name: Remove Merged PR Database
+
+on:
+  pull_request:
+    types:
+      - closed
+
+jobs:
+  remove-merged-pr-database:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Get Closed PR Head Ref Branch Name
+        id: get_branch_name
+        run: |
+          branch_name=${{ github.event.pull_request.head.ref }}
+          if [[ $branch_name == "develop" ]]; then
+            branch_name="preview/develop"
+          fi
+          echo "branch_name=${branch_name}" >> $GITHUB_OUTPUT
+
+      - name: Search branch by name
+        id: get_branch_id
+        # list all branches and filter by name
+        run: |
+          branch_id=$(curl --silent \
+          "https://console.neon.tech/api/v2/projects/${{ secrets.NEON_PROJECT_ID }}/branches" \
+          --header "Accept: application/json" \
+          --header "Content-Type: application/json" \
+          --header "Authorization: Bearer ${{ secrets.NEON_API_KEY }}" \
+          | jq -r .branches \
+          | jq -c '.[] | select(.name | contains("'${{ steps.get_branch_name.outputs.branch_name }}'")) .id' \
+          | jq -r \
+          ) \
+
+          echo "branch_id=${branch_id}" >> $GITHUB_OUTPUT
+
+      - name: Delete Neon Branch (latest Preview Branch)
+        uses: neondatabase/delete-branch-action@v2
+        with:
+          project_id: ${{ secrets.NEON_PROJECT_ID }}
+          branch_id: ${{ steps.get_branch_id.outputs.branch_id }}
+          api_key: ${{ secrets.NEON_API_KEY }}
