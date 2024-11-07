@@ -7,7 +7,8 @@ const openRoutes = [
   "/auth/login",
   "/auth/logout",
   "/auth/register",
-  "/api/stripe/webhook" // Stripe webhook endpoint is included here, otherwise the pending webhook status will be a 302 ERR 
+  "/api/stripe/webhook", // Stripe webhook endpoint is included here, otherwise the pending webhook status will be a 302 ERR 
+  "/track"
 ]; // Routes that don't need the user to be logged in
 
 export const handle: Handle = async ({ event, resolve }) => {
