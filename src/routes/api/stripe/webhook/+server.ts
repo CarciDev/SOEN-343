@@ -8,7 +8,6 @@ import { ShipmentTransactionRepository } from "$lib/domain/ShipmentTransactionRe
 import { toBuffer } from "$lib/utils";
 
 export const POST: RequestHandler = async ({ request }) => {
-
   // the stripe-signature header to ensure requests are coming from Stripe, not another 3rd party.
   const stripeSignature = request.headers.get("stripe-signature");
 
@@ -19,7 +18,7 @@ export const POST: RequestHandler = async ({ request }) => {
 
   const _rawBody = await request.arrayBuffer(); // Get the raw request body
   // Converting the body ensures that the raw binary data format matches Stripe’s expectations / SDK functions.
-	const payload = toBuffer(_rawBody);
+  const payload = toBuffer(_rawBody);
 
   const endpointSecret = getEnvVar("STRIPE_SIGNING_SECRET");
 
@@ -30,34 +29,37 @@ export const POST: RequestHandler = async ({ request }) => {
     stripeEvent = stripe.webhooks.constructEvent(
       payload,
       stripeSignature,
-      endpointSecret
+      endpointSecret,
     ) as Stripe.DiscriminatedEvent;
   } catch (e) {
     return json("Invalid signature", { status: 401 });
   }
 
   try {
-    switch (stripeEvent.type) { // the only event our webhook cares about right now is checkout.session.completed
+    switch (
+      stripeEvent.type // the only event our webhook cares about right now is checkout.session.completed
+    ) {
       case "checkout.session.completed":
         // We've reached the point where customer has paid for their order,
         // and now by listening for that event we can create a corresponding ShipmentTransaction.
         console.log("Checkout session completed", stripeEvent);
-        
-        const sessionWithCustomer = await stripe.checkout.sessions.retrieve(stripeEvent.data.object.id);
-  
+
+        const sessionWithCustomer = await stripe.checkout.sessions.retrieve(
+          stripeEvent.data.object.id,
+        );
+
         if (sessionWithCustomer.metadata) {
-  
           const quotationId = Number(sessionWithCustomer.metadata.quotation_id);
           const shipperId = Number(sessionWithCustomer.metadata.shipper_id);
 
           // Create a ShipmentTransaction with the GOF Factory pattern for the Stripe transaction
-          const StripeShipmentTransaction = ShipmentTransactionFactory
-            .createWithStripeTransactionType({
+          const StripeShipmentTransaction =
+            ShipmentTransactionFactory.createWithStripeTransactionType({
               quotationId: quotationId,
               transactionDetail: "", // Include transaction details eventually, ex. Stripe invoice details.
               shipperId: shipperId,
             });
-          
+
           // for the time being, please seed some quotation objects for this to work.
           // just a temporary fix until the quotation objects themselves are passed to checkout,
           // rather than dummy object parameters.
