@@ -1,10 +1,28 @@
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, type Quotation } from "@prisma/client";
 import { fail, type Actions } from "@sveltejs/kit";
 import type { ServerLoad } from "@sveltejs/kit";
 import { geocodingService } from "$lib/config/GeocodingConfig";
 import { _calculatePrice } from "../api/pricing/+server";
 
 const prisma = new PrismaClient();
+
+export async function load({ url }) {
+  const quotationId = url.searchParams.get("quotationId");
+
+  let retrievedQuotation;
+  if (quotationId !== null && quotationId !== "") {
+    retrievedQuotation = await prisma.quotation.findUnique({
+      where: { id: parseInt(quotationId, 10) },
+      include: {
+        origin: true,
+        destination: true,
+        box: true,
+        shipmentTransaction: true,
+      },
+    });
+  }
+  return { retrievedQuotation };
+}
 
 export const actions = {
   createQuotation: async ({ request, locals }) => {
@@ -137,7 +155,7 @@ export const actions = {
           box: true,
           shipmentTransaction: true,
         },
-      });
+      }) as Quotation;
 
       if (!quotation) {
         return fail(404, {
@@ -147,8 +165,7 @@ export const actions = {
       }
 
       return {
-        success: true,
-        quotation,
+        quotation: quotation // returns k-v format
       };
     } catch (error) {
       console.error("Error retrieving quotation:", error);

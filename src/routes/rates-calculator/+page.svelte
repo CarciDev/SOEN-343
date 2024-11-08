@@ -1,16 +1,18 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
-  import type { PageData } from "$lib/types";
+  import type { PageData } from "./$types";
+  import type { Quotation } from "@prisma/client";
   import { invalidateAll } from "$app/navigation";
   import { fade } from "svelte/transition";
+  import { redirect } from "@sveltejs/kit";
 
   export let data: PageData;
   let showForm = false;
   let error: { message: string; field?: string } | null = null;
   let loading = false;
-  let newQuotation = null;
+  let lastQuotation;
   let quotationId = "";
-  let retrievedQuotation = null;
+  let retrievedQuotation = data.retrievedQuotation;
 
   function formatAmount(cents: number): string {
     return (cents / 100).toLocaleString("en-US", {
@@ -27,7 +29,7 @@
     const formData = new FormData(form);
 
     try {
-      const response = await fetch("/api/quotations", {
+      const response = await fetch("quotation/createQuotation", {
         method: "POST",
         body: formData,
       });
@@ -43,7 +45,7 @@
       } else {
         error = null;
         showForm = false;
-        newQuotation = result.quotation;
+        lastQuotation = result.data.quotation;
         await invalidateAll();
       }
     } catch (err: any) {
@@ -52,22 +54,10 @@
     }
   }
 
-  async function retrieveQuotation() {
-    loading = true;
-    error = null;
-
-    try {
-      // is this even the right endpoint?
-      const response = await fetch(`/api/quotations/${quotationId}`);
-      if (!response.ok) {
-        throw new Error("Failed to retrieve quotation");
-      }
-      retrievedQuotation = await response.json();
-    } catch (err: any) {
-      error = { message: err.message, field: "retrieve" };
-    } finally {
-      loading = false;
-    }
+  async function redirectToQuotation() {
+    console.log("Redirecting");
+    // Not Good Practice:
+    window.location.href="/rates-calculator?quotationId=" + quotationId;
   }
 </script>
 
@@ -91,7 +81,7 @@
     </label>
     <button
       class="rounded bg-green-500 px-4 py-2 text-white transition-colors hover:bg-green-600"
-      on:click={retrieveQuotation}
+      on:click={redirectToQuotation}
       disabled={loading}>
       {loading ? "Retrieving..." : "Retrieve Quotation"}
     </button>
@@ -104,10 +94,41 @@
 </div>
 
 {#if retrievedQuotation}
-  <div class="mt-4 rounded bg-gray-100 p-4">
-    <h2 class="text-xl font-bold">Retrieved Quotation</h2>
-    <pre>{JSON.stringify(retrievedQuotation, null, 2)}</pre>
-  </div>
+<div class="mt-6">
+  <h2 class="text-xl font-bold">Retrieved Quotation</h2>
+  <table class="w-full border-collapse border border-gray-300 mt-4">
+    <thead>
+      <tr>
+        <th class="border border-gray-300 p-2">ID</th>
+        <th class="border border-gray-300 p-2">Origin</th>
+        <th class="border border-gray-300 p-2">Destination</th>
+        <th class="border border-gray-300 p-2">Dimensions</th>
+        <th class="border border-gray-300 p-2">Weight</th>
+        <th class="border border-gray-300 p-2">Cost</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="border border-gray-300 p-2">
+          {retrievedQuotation.id}
+        </td>
+        <td class="border border-gray-300 p-2">
+          {retrievedQuotation.origin.city}, {retrievedQuotation.origin.countryCode}
+        </td>
+        <td class="border border-gray-300 p-2">
+          {retrievedQuotation.destination.city}, {retrievedQuotation.destination.countryCode}
+        </td>
+        <td class="border border-gray-300 p-2">
+          {retrievedQuotation.box.widthCm} x {retrievedQuotation.box.widthCm} x {retrievedQuotation.box.heightCm} cm
+        </td>
+        <td class="border border-gray-300 p-2">{retrievedQuotation.box.weightG} g</td>
+        <td class="border border-gray-300 p-2">
+          {formatAmount(retrievedQuotation.amountQuotedCents)}
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 {/if}
 
 {#if showForm}
@@ -240,7 +261,7 @@
       <div class="mt-6">
         <h3 class="mb-2 font-bold">Package Dimensions</h3>
         <div class="grid grid-cols-4 gap-4">
-          <div class="mb-4">
+          <!-- <div class="mb-4">
             <label class="mb-2 block text-sm font-bold text-gray-700">
               Length (cm)
               <input
@@ -251,7 +272,7 @@
                 class="w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow"
                 required />
             </label>
-          </div>
+          </div> -->
           <div class="mb-4">
             <label class="mb-2 block text-sm font-bold text-gray-700">
               Width (cm)
@@ -315,9 +336,40 @@
   </div>
 {/if}
 
-{#if newQuotation}
-  <div class="mt-6 rounded bg-gray-100 p-4">
-    <h2 class="text-xl font-bold">Newly Created Quotation</h2>
-    <pre>{JSON.stringify(newQuotation, null, 2)}</pre>
-  </div>
-{/if}
+{#if lastQuotation}
+    <div class="mt-6">
+      <h2 class="text-xl font-bold">Last Quotation</h2>
+      <table class="w-full border-collapse border border-gray-300 mt-4">
+        <thead>
+          <tr>
+            <th class="border border-gray-300 p-2">ID</th>
+            <th class="border border-gray-300 p-2">Origin</th>
+            <th class="border border-gray-300 p-2">Destination</th>
+            <th class="border border-gray-300 p-2">Dimensions</th>
+            <th class="border border-gray-300 p-2">Weight</th>
+            <th class="border border-gray-300 p-2">Cost</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="border border-gray-300 p-2">
+              {lastQuotation.id}
+            </td>
+            <td class="border border-gray-300 p-2">
+              {lastQuotation.origin.city}, {lastQuotation.origin.countryCode}
+            </td>
+            <td class="border border-gray-300 p-2">
+              {lastQuotation.destination.city}, {lastQuotation.destination.countryCode}
+            </td>
+            <td class="border border-gray-300 p-2">
+              {lastQuotation.box.widthCm} x {lastQuotation.box.widthCm} x {lastQuotation.box.heightCm} cm
+            </td>
+            <td class="border border-gray-300 p-2">{lastQuotation.box.weightG} g</td>
+            <td class="border border-gray-300 p-2">
+              {formatAmount(lastQuotation.amountQuotedCents)}
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  {/if}
