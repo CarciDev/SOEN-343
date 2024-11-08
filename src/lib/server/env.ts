@@ -6,9 +6,9 @@
  * @throws {Error} If the environment variable is not defined.
  */
 export function getEnvVar(name: string): string {
-    const value = process.env[name];
-    if (!value) {
-      throw new Error(`${name} is not defined`);
-    }
-    return value;
+  const value = process.env[name];
+  if (!value) {
+    throw new Error(`${name} is not defined`);
+  }
+  return value;
 }

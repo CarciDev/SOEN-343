@@ -3,13 +3,14 @@ import { ShipmentTransaction } from "./ShipmentTransaction";
 
 export class ShipmentTransactionRepository {
   static async save(shipmentTransaction: ShipmentTransaction) {
-
     const quotationExists = await prisma.quotation.findUnique({
       where: { id: shipmentTransaction.quotationId },
     });
 
     if (!quotationExists) {
-      throw new Error(`Quotation with id ${shipmentTransaction.quotationId} does not exist.`);
+      throw new Error(
+        `Quotation with id ${shipmentTransaction.quotationId} does not exist.`,
+      );
     }
 
     const dataFields = {
