@@ -56,7 +56,9 @@ export async function createQuotationCheckoutSession(
     });
 
     if (!checkoutSession.url) {
-      console.warn("Failed to create a checkout session URL. Redirecting to the homepage.");
+      console.warn(
+        "Failed to create a checkout session URL. Redirecting to the homepage.",
+      );
       return `${process.env.PUBLIC_BASE_URL}/`; // Redirect to the homepage
     }
 

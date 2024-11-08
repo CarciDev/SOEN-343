@@ -7,10 +7,11 @@ import { ShipmentTransactionRepository } from "$lib/domain/ShipmentTransactionRe
 import { toBuffer } from "$lib/utils";
 
 export const POST: RequestHandler = async ({ request }) => {
-
   // Check if Stripe is initialized
   if (!stripe) {
-    console.warn("Stripe is not initialized. Returning a success response anyways for Stripe.");
+    console.warn(
+      "Stripe is not initialized. Returning a success response anyways for Stripe.",
+    );
     return json({ success: true }, { status: 200 });
   }
 
@@ -28,7 +29,9 @@ export const POST: RequestHandler = async ({ request }) => {
 
   const endpointSecret = process.env.STRIPE_SIGNING_SECRET;
   if (!endpointSecret) {
-    console.warn("Missing Stripe endpoint secret. Returning a success response anyways for Stripe.");
+    console.warn(
+      "Missing Stripe endpoint secret. Returning a success response anyways for Stripe.",
+    );
     return json({ success: true }, { status: 200 });
   }
 
