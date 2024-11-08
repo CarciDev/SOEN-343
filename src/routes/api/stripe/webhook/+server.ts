@@ -52,7 +52,7 @@ export const POST: RequestHandler = async ({ request }) => {
     switch (
       stripeEvent.type // the only event our webhook cares about right now is checkout.session.completed
     ) {
-      case "checkout.session.completed":
+      case "checkout.session.completed": {
         // We've reached the point where customer has paid for their order,
         // and now by listening for that event we can create a corresponding ShipmentTransaction.
         console.log("Checkout session completed", stripeEvent);
@@ -80,9 +80,11 @@ export const POST: RequestHandler = async ({ request }) => {
         }
 
         break;
-      default:
+      }
+      default: {
         console.warn(`Unhandled event type: ${stripeEvent.type}`);
         return json({ success: true }, { status: 200 });
+      }
     }
     // For more information, see the Stripe Docs on Webhook Events: https://stripe.com/docs/webhooks/stripe-events
     // ... and the Stripe API docs on event types we can work with: https://docs.stripe.com/api/events/types

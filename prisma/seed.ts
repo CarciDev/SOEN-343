@@ -1,3 +1,4 @@
+/*eslint no-unused-vars: "_"*/
 import { TrackingStatus, TransactionType, UserRole } from "@prisma/client";
 import { prisma } from "../src/lib/db/client.ts";
 import bcrypt from "bcrypt";
@@ -85,7 +86,8 @@ async function seedAll() {
     },
   });
 
-  const quote2 = await prisma.quotation.upsert({
+  
+  const _quote2 = await prisma.quotation.upsert({
     where: { id: 2 },
     update: {},
     create: {
@@ -97,7 +99,7 @@ async function seedAll() {
     },
   });
 
-  const quote3 = await prisma.quotation.upsert({
+  const _quote3 = await prisma.quotation.upsert({
     where: { id: 2 },
     update: {},
     create: {
