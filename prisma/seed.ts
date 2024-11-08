@@ -1,4 +1,3 @@
-/*eslint no-unused-vars: "_"*/
 import { TrackingStatus, TransactionType, UserRole } from "@prisma/client";
 import { prisma } from "../src/lib/db/client.ts";
 import bcrypt from "bcrypt";
@@ -86,8 +85,8 @@ async function seedAll() {
     },
   });
 
-  
-  const _quote2 = await prisma.quotation.upsert({
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const quote2 = await prisma.quotation.upsert({
     where: { id: 2 },
     update: {},
     create: {
@@ -98,9 +97,9 @@ async function seedAll() {
       boxId: box.id,
     },
   });
-
-  const _quote3 = await prisma.quotation.upsert({
-    where: { id: 2 },
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const quote3 = await prisma.quotation.upsert({
+    where: { id: 3 },
     update: {},
     create: {
       id: 3,

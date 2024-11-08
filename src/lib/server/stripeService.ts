@@ -27,7 +27,7 @@ export async function createQuotationCheckoutSession(
     }
 
     const checkoutSession = await stripe.checkout.sessions.create({
-      //@ts-expect-error
+      //@ts-expect-error: Stripe's types do not explicitly include "payment_method_types" in some cases
       payment_method_types: ["card"],
       mode: "payment",
       allow_promotion_codes: true,
