@@ -81,7 +81,7 @@ export const actions = {
           { lat: originResult.lat, lng: originResult.lng },
           { lat: destResult.lat, lng: destResult.lng },
           {
-            length: parseFloat(formData.get("length") as string),
+            depth: parseFloat(formData.get("depth") as string),
             width: parseFloat(formData.get("width") as string),
             height: parseFloat(formData.get("height") as string),
             weight: parseFloat(formData.get("weight") as string),

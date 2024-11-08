@@ -184,9 +184,9 @@
           <div class="grid grid-cols-4 gap-4">
             <div class="mb-4">
               <label class="mb-2 block text-sm font-bold text-gray-700">
-                Length (cm)
+                Depth (cm)
                 <input
-                  name="length"
+                  name="depth"
                   type="number"
                   min="1"
                   step="0.1"
@@ -211,18 +211,6 @@
                 Height (cm)
                 <input
                   name="height"
-                  type="number"
-                  min="1"
-                  step="0.1"
-                  class="w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow"
-                  required />
-              </label>
-            </div>
-            <div class="mb-4">
-              <label class="mb-2 block text-sm font-bold text-gray-700">
-                Depth (cm)
-                <input
-                  name="depth"
                   type="number"
                   min="1"
                   step="0.1"

@@ -17,7 +17,7 @@ export class PricingContext {
   calculatePrice(
     originCoords: { lat: number; lng: number },
     destCoords: { lat: number; lng: number },
-    dimensions: { length: number; width: number; height: number; weight: number },
+    dimensions: { depth: number; width: number; height: number; weight: number },
     originCountryCode: string,
     destinationCountryCode: string
   ): Promise<number> {
@@ -26,7 +26,7 @@ export class PricingContext {
     let weightThreshold = 30000; // 30kg
     if (originCountryCode !== destinationCountryCode) {
       this.strategy = new InternationalPricingStrategy();
-    } else if (dimensions.length * dimensions.width * dimensions.height > volumeThreshold || dimensions.weight > weightThreshold) {
+    } else if (dimensions.depth * dimensions.width * dimensions.height > volumeThreshold || dimensions.weight > weightThreshold) {
       this.strategy = new OversizedOverweightPricingStrategy();
     } else {
       this.strategy = new DefaultPricingStrategy();
