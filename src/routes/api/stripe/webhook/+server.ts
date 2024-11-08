@@ -2,12 +2,19 @@ import { json } from "@sveltejs/kit";
 import type { RequestHandler } from "./$types";
 import type Stripe from "stripe";
 import { stripe } from "$lib/server/stripeService";
-import { getEnvVar } from "$lib/server/env";
 import { ShipmentTransactionFactory } from "$lib/domain/ShipmentTransactionFactory";
 import { ShipmentTransactionRepository } from "$lib/domain/ShipmentTransactionRepository";
 import { toBuffer } from "$lib/utils";
 
 export const POST: RequestHandler = async ({ request }) => {
+  // Check if Stripe is initialized
+  if (!stripe) {
+    console.warn(
+      "Stripe is not initialized. Returning a success response anyways for Stripe.",
+    );
+    return json({ success: true }, { status: 200 });
+  }
+
   // the stripe-signature header to ensure requests are coming from Stripe, not another 3rd party.
   const stripeSignature = request.headers.get("stripe-signature");
 
@@ -20,7 +27,13 @@ export const POST: RequestHandler = async ({ request }) => {
   // Converting the body ensures that the raw binary data format matches Stripe’s expectations / SDK functions.
   const payload = toBuffer(_rawBody);
 
-  const endpointSecret = getEnvVar("STRIPE_SIGNING_SECRET");
+  const endpointSecret = process.env.STRIPE_SIGNING_SECRET;
+  if (!endpointSecret) {
+    console.warn(
+      "Missing Stripe endpoint secret. Returning a success response anyways for Stripe.",
+    );
+    return json({ success: true }, { status: 200 });
+  }
 
   let stripeEvent: Stripe.DiscriminatedEvent;
 
@@ -39,7 +52,7 @@ export const POST: RequestHandler = async ({ request }) => {
     switch (
       stripeEvent.type // the only event our webhook cares about right now is checkout.session.completed
     ) {
-      case "checkout.session.completed":
+      case "checkout.session.completed": {
         // We've reached the point where customer has paid for their order,
         // and now by listening for that event we can create a corresponding ShipmentTransaction.
         console.log("Checkout session completed", stripeEvent);
@@ -67,9 +80,11 @@ export const POST: RequestHandler = async ({ request }) => {
         }
 
         break;
-      default:
+      }
+      default: {
         console.warn(`Unhandled event type: ${stripeEvent.type}`);
         return json({ success: true }, { status: 200 });
+      }
     }
     // For more information, see the Stripe Docs on Webhook Events: https://stripe.com/docs/webhooks/stripe-events
     // ... and the Stripe API docs on event types we can work with: https://docs.stripe.com/api/events/types

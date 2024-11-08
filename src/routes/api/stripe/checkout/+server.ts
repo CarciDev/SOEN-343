@@ -26,6 +26,7 @@ export const GET: RequestHandler = async (event) => {
     originId: 1,
     destinationId: 2,
     amountQuotedCents: quotationPriceInCents,
+    etaDays: 1,
     boxId: 3,
   });
 

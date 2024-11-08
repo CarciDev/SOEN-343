@@ -85,6 +85,7 @@ async function seedAll() {
     },
   });
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const quote2 = await prisma.quotation.upsert({
     where: { id: 2 },
     update: {},
@@ -96,9 +97,9 @@ async function seedAll() {
       boxId: box.id,
     },
   });
-
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const quote3 = await prisma.quotation.upsert({
-    where: { id: 2 },
+    where: { id: 3 },
     update: {},
     create: {
       id: 3,
