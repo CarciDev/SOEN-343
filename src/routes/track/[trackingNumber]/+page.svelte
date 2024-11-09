@@ -20,6 +20,7 @@
       {data.origin?.administrativeArea || ""}
       {data.origin?.postalCode || ""}{#if data.origin?.city}<br />{/if}
       {data.origin?.countryCode || ""}
+      <br /><br />
     </div>
     <div class="card p-4">
       <h3 class="text-xl font-bold">Destination</h3>
@@ -32,6 +33,7 @@
       {data.destination?.postalCode ||
         ""}{#if data.destination?.city}<br />{/if}
       {data.destination?.countryCode || ""}
+      <br /><br />
     </div>
     <div class="card p-4">
       <div class="text-xl font-bold">Status</div>
@@ -43,6 +45,10 @@
         Last updated: {formatDbReservationDate(
           data.events[0].createdAt ?? new Date(),
         )}, {data.events[0].createdAt?.toLocaleTimeString()}
+        <br />
+        Shipment paid for: {data.transaction.createdAt
+          ? formatDbReservationDate(data.transaction.createdAt)
+          : ""}
         <br />
         {#if data.eta}
           Promised delivery date: {formatDbReservationDate(data.eta)}
