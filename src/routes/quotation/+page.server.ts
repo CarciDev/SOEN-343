@@ -3,6 +3,8 @@ import { PrismaClient } from "@prisma/client";
 import { fail, type Actions } from "@sveltejs/kit";
 import type { ServerLoad } from "@sveltejs/kit";
 import { geocodingService } from "$lib/config/GeocodingConfig";
+import { BoxRepository } from "$lib/domain/BoxRepository";
+import { EarthLocationRepository } from "$lib/domain/EarthLocationRepository";
 import { QuotationRepository } from "$lib/domain/QuotationRepository";
 import { _calculatePrice } from "../api/pricing/+server";
 
@@ -47,7 +49,7 @@ export const actions = {
 
       // Only proceed if both addresses are valid
       if (originResult.valid && destResult.valid) {
-        // Replace this with EarthLocationRepository.save()
+        // Replace this with BoxRepository.save(box: Box)
         const box = await prisma.box.create({
           data: {
             depthCm: parseFloat(formData.get("depth") as string),
@@ -57,7 +59,7 @@ export const actions = {
           },
         });
 
-        // Replace this with EarthLocationRepository.save()
+        // Replace this with EarthLocationRepository.save(earthLocation: EarthLocation)
         const origin = await prisma.earthLocation.create({
           data: {
             address1: formData.get("originAddress1") as string,
@@ -69,7 +71,7 @@ export const actions = {
           },
         });
 
-        // Replace this with EarthLocationRepository.save()
+        // Replace this with EarthLocationRepository.save(earthLocation: EarthLocation)
         const destination = await prisma.earthLocation.create({
           data: {
             address1: formData.get("destAddress1") as string,
@@ -94,7 +96,7 @@ export const actions = {
           destResult.countryCode as string,
         );
 
-        // Replace this with QuotationRepository.save()
+        // Replace this with QuotationRepository.save(quotation: Quotation)
         const quotation = await prisma.quotation.create({
           data: {
             originId: origin.id,
@@ -132,7 +134,7 @@ export const actions = {
 } satisfies Actions;
 
 export const load = (async () => {
-  // Get the last quotation made
+  // Replace this with QuotationRepository.findById(id: number)
   const lastQuotation = await prisma.quotation.findFirst({
     orderBy: {
       createdAt: "desc",
