@@ -19,6 +19,7 @@ export class BoxRepository {
     box.id = savedBox.id;
     box.createdAt = savedBox.createdAt;
     box.updatedAt = savedBox.updatedAt;
+    return box;
   }
 
   static async findById(id: number): Promise<Box | null> {

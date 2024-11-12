@@ -5,7 +5,7 @@ export class InternationalPricingStrategy implements PricingStrategy {
   async calculatePrice(
     originCoords: { lat: number; lng: number },
     destCoords: { lat: number; lng: number },
-    dimensions: { length: number; width: number; height: number; weight: number },
+    dimensions: { depth: number; width: number; height: number; weight: number },
     originCountryCode: string,
     destinationCountryCode: string
   ): Promise<number> {
@@ -25,7 +25,7 @@ export class InternationalPricingStrategy implements PricingStrategy {
 
     const distanceFee = distance * .060; // Example: $0.00060 per km
 
-    const volume = dimensions.length * dimensions.width * dimensions.height;
+    const volume = dimensions.depth * dimensions.width * dimensions.height;
     const weightFee = dimensions.weight * weightMultiplier;
     const volumeFee = volume * volumeMultiplier;
 

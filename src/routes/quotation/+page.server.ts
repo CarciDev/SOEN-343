@@ -1,6 +1,5 @@
-
 import { PrismaClient } from "@prisma/client";
-import { fail, type Actions } from "@sveltejs/kit";
+import { redirect, fail, type Actions } from "@sveltejs/kit";
 import type { ServerLoad } from "@sveltejs/kit";
 import { geocodingService } from "$lib/config/GeocodingConfig";
 import { BoxRepository } from "$lib/domain/BoxRepository";
@@ -96,29 +95,21 @@ export const actions = {
           destResult.countryCode as string,
         );
 
-        // Replace this with QuotationRepository.save(quotation: Quotation)
-        const quotation = await prisma.quotation.create({
-          data: {
-            originId: origin.id,
-            destinationId: destination.id,
-            boxId: box.id,
-            amountQuotedCents: shippingCost,
-          },
-          include: {
-            origin: true,
-            destination: true,
-            box: true,
-            shipmentTransaction: true,
-          },
+        // Use QuotationRepository.save(quotation: Quotation)
+        const quotation = await QuotationRepository.save({
+          id: undefined,
+          originId: origin.id,
+          destinationId: destination.id,
+          amountQuotedCents: shippingCost,
+          boxId: box.id,
         });
 
         return {
           success: true,
-          quotation,
+          quotationId: quotation.id,
         };
       }
 
-      // Should never reach here due to earlier validation
       return fail(400, {
         success: false,
         message: "Address validation failed",
@@ -132,22 +123,3 @@ export const actions = {
     }
   },
 } satisfies Actions;
-
-export const load = (async () => {
-  // Replace this with QuotationRepository.findById(id: number)
-  const lastQuotation = await prisma.quotation.findFirst({
-    orderBy: {
-      createdAt: "desc",
-    },
-    include: {
-      origin: true,
-      destination: true,
-      box: true,
-      shipmentTransaction: true,
-    },
-  });
-
-  return {
-    lastQuotation
-  };
-}) satisfies ServerLoad;
