@@ -23,7 +23,7 @@
   title="Game by SvelteShip Solutions"
   bind:this={iframe}
   src={url}
-  style="width: 640px; height: 640px; overflow: hidden; border: none;"
+  class="h-[640px] w-[640px] resize overflow-auto"
   scrolling="no"
   allow="autoplay">
 </iframe>

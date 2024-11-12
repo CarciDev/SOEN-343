@@ -1,4 +1,4 @@
-export type GameKey = "Flappy Package" | "Package Clicker" | "Package Crush";
+export type GameKey = "Flappy Package" | "Package Clicker" | "Package Climber";
 
 export class GameFacade {
   private gameUrls: Record<GameKey, string>;

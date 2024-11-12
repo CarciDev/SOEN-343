@@ -5,7 +5,7 @@
   const gameUrls: Record<GameKey, string> = {
     "Flappy Package": "https://niravanaa.github.io/FlappyPackage/",
     "Package Clicker": "https://niravanaa.github.io/PackageClicker/",
-    "Package Crush": "https://example.com/game3",
+    "Package Climber": "https://niravanaa.github.io/PackageClimber/",
   };
 
   const gameFacade = new GameFacade(gameUrls);
