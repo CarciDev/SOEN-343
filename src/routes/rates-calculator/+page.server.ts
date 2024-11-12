@@ -104,7 +104,7 @@ export const actions = {
           { lat: originResult.lat, lng: originResult.lng },
           { lat: destResult.lat, lng: destResult.lng },
           {
-            length: parseFloat(formData.get("length") as string),
+            depth: parseFloat(formData.get("length") as string),
             width: parseFloat(formData.get("width") as string),
             height: parseFloat(formData.get("height") as string),
             weight: parseFloat(formData.get("weight") as string),
@@ -154,16 +154,7 @@ export const actions = {
     const id = formData.get("quotationId") as string;
 
     try {
-      // Replace this with QuotationRepository.findById(id: number)
-      const quotation = await prisma.quotation.findUnique({
-        where: { id: parseInt(id, 10) },
-        include: {
-          origin: true,
-          destination: true,
-          box: true,
-          shipmentTransaction: true,
-        },
-      }) as Quotation;
+      const quotation = await QuotationRepository.findById(parseInt(id, 10));
 
       if (!quotation) {
         return fail(404, {
