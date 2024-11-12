@@ -3,6 +3,7 @@ import { PrismaClient } from "@prisma/client";
 import { fail, type Actions } from "@sveltejs/kit";
 import type { ServerLoad } from "@sveltejs/kit";
 import { geocodingService } from "$lib/config/GeocodingConfig";
+import { QuotationRepository } from "$lib/domain/QuotationRepository";
 import { _calculatePrice } from "../api/pricing/+server";
 
 const prisma = new PrismaClient();
@@ -46,6 +47,7 @@ export const actions = {
 
       // Only proceed if both addresses are valid
       if (originResult.valid && destResult.valid) {
+        // Replace this with EarthLocationRepository.save()
         const box = await prisma.box.create({
           data: {
             depthCm: parseFloat(formData.get("depth") as string),
@@ -55,6 +57,7 @@ export const actions = {
           },
         });
 
+        // Replace this with EarthLocationRepository.save()
         const origin = await prisma.earthLocation.create({
           data: {
             address1: formData.get("originAddress1") as string,
@@ -66,6 +69,7 @@ export const actions = {
           },
         });
 
+        // Replace this with EarthLocationRepository.save()
         const destination = await prisma.earthLocation.create({
           data: {
             address1: formData.get("destAddress1") as string,
@@ -90,6 +94,7 @@ export const actions = {
           destResult.countryCode as string,
         );
 
+        // Replace this with QuotationRepository.save()
         const quotation = await prisma.quotation.create({
           data: {
             originId: origin.id,
