@@ -1,5 +1,6 @@
 <script lang="ts">
   import { formatDbReservationDate, formatTrackingStatus } from "$lib/utils.js";
+  import GameFacade from "$lib/components/Game/GameFacade.svelte";
 
   export let data;
 </script>
@@ -60,7 +61,7 @@
   </div>
 
   <h3 class="mb-6 text-xl font-bold">Tracking History</h3>
-  <div class="table-container">
+  <div class="table-container mb-6">
     <table class="table table-hover">
       <thead>
         <tr>
@@ -95,5 +96,10 @@
         {/each}
       </tbody>
     </table>
+  </div>
+  <h3 class="mb-6 text-xl font-bold">Live Map</h3>
+  <div class="grid grid-cols-1 grid-rows-2 gap-4 sm:grid-cols-2 sm:grid-rows-1">
+    <div class="card p-4">Map</div>
+    <GameFacade />
   </div>
 </div>
