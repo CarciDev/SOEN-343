@@ -66,38 +66,32 @@ export const actions = {
 
       // Only proceed if both addresses are valid
       if (originResult.valid && destResult.valid) {
-        // Replace this with BoxRepository.save(box: Box)
-        const box = await prisma.box.create({
-          data: {
-            depthCm: parseFloat(formData.get("depth") as string),
-            widthCm: parseFloat(formData.get("width") as string),
-            heightCm: parseFloat(formData.get("height") as string),
-            weightG: parseFloat(formData.get("weight") as string),
-          },
+        const box = await BoxRepository.save({
+          // id: undefined,
+          depthCm: parseFloat(formData.get("depth") as string),
+          widthCm: parseFloat(formData.get("width") as string),
+          heightCm: parseFloat(formData.get("height") as string),
+          weightG: parseFloat(formData.get("weight") as string),
         });
 
-        // Replace this with EarthLocationRepository.save(earthLocation: EarthLocation)
-        const origin = await prisma.earthLocation.create({
-          data: {
-            address1: formData.get("originAddress1") as string,
-            city: formData.get("originCity") as string,
-            countryCode: formData.get("originCountry") as string,
-            postalCode: formData.get("originPostal") as string,
-            lat: originResult.lat,
-            lng: originResult.lng,
-          },
+        const origin = await EarthLocationRepository.save({
+          // id: undefined,
+          address1: formData.get("originAddress1") as string,
+          city: formData.get("originCity") as string,
+          countryCode: formData.get("originCountry") as string,
+          postalCode: formData.get("originPostal") as string,
+          lat: originResult.lat,
+          lng: originResult.lng,
         });
 
-        // Replace this with EarthLocationRepository.save(earthLocation: EarthLocation)
-        const destination = await prisma.earthLocation.create({
-          data: {
-            address1: formData.get("destAddress1") as string,
-            city: formData.get("destCity") as string,
-            countryCode: formData.get("destCountry") as string,
-            postalCode: formData.get("destPostal") as string,
-            lat: destResult.lat,
-            lng: destResult.lng,
-          },
+        const destination = await EarthLocationRepository.save({
+          // id: undefined,
+          address1: formData.get("destAddress1") as string,
+          city: formData.get("destCity") as string,
+          countryCode: formData.get("destCountry") as string,
+          postalCode: formData.get("destPostal") as string,
+          lat: destResult.lat,
+          lng: destResult.lng,
         });
 
         const shippingCost = await _calculatePrice(
@@ -113,29 +107,30 @@ export const actions = {
           destResult.countryCode as string,
         );
 
-        // Replace this with QuotationRepository.save(quotation: Quotation)
-        const quotation = await prisma.quotation.create({
-          data: {
-            originId: origin.id,
-            destinationId: destination.id,
-            boxId: box.id,
-            amountQuotedCents: shippingCost,
-          },
+        const quotation = await QuotationRepository.save({
+          // id: undefined,
+          originId: origin.id!,
+          destinationId: destination.id!,
+          amountQuotedCents: shippingCost,
+          boxId: box.id!,
+        });
+
+        // Fetch the complete quotation with related data
+        const completeQuotation = await prisma.quotation.findUnique({
+          where: { id: quotation.id },
           include: {
             origin: true,
             destination: true,
             box: true,
-            shipmentTransaction: true,
           },
         });
 
         return {
           success: true,
-          quotation,
+          quotation: completeQuotation,
         };
       }
 
-      // Should never reach here due to earlier validation
       return fail(400, {
         success: false,
         message: "Address validation failed",
@@ -164,7 +159,7 @@ export const actions = {
       }
 
       return {
-        quotation: quotation // returns k-v format
+        quotation: quotation, // returns k-v format
       };
     } catch (error) {
       console.error("Error retrieving quotation:", error);

@@ -62,7 +62,7 @@
 </script>
 
 <div class="container mx-auto p-4">
-  <h1 class="mb-4 text-2xl font-bold">Create Shipping Quote</h1>
+  <h1 class="mb-4 text-2xl font-bold text-gray-800 dark:text-gray-100">Create Shipping Quote</h1>
 
   <button
     class="mb-4 rounded bg-blue-500 px-4 py-2 text-white transition-colors hover:bg-blue-600"
@@ -70,14 +70,14 @@
     {showForm ? "Hide Form" : "New Quote"}
   </button>
 
-  <div class="mb-4 rounded bg-white px-8 pb-8 pt-6 shadow-md">
-    <label class="mb-4 block text-sm font-bold text-gray-700">
+  <div class="mb-4 rounded bg-white px-8 pb-8 pt-6 shadow-md dark:bg-gray-800">
+    <label class="mb-4 block text-sm font-bold text-gray-700 dark:text-gray-200">
       Quotation ID
       <input
         type="text"
         bind:value={quotationId}
         placeholder="Enter Quotation ID"
-        class="w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow" />
+        class="w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow dark:bg-gray-700 dark:text-gray-200" />
     </label>
     <button
       class="rounded bg-green-500 px-4 py-2 text-white transition-colors hover:bg-green-600"
@@ -86,7 +86,7 @@
       {loading ? "Retrieving..." : "Retrieve Quotation"}
     </button>
     {#if error && error.field === "retrieve"}
-      <div class="mt-4 rounded bg-red-100 p-4 text-red-700" transition:fade>
+      <div class="mt-4 rounded bg-red-100 p-4 text-red-700 dark:bg-red-200 dark:text-red-800" transition:fade>
         {error.message}
       </div>
     {/if}
@@ -94,35 +94,35 @@
 </div>
 
 {#if retrievedQuotation}
-<div class="mt-6">
-  <h2 class="text-xl font-bold">Retrieved Quotation</h2>
-  <table class="w-full border-collapse border border-gray-300 mt-4">
+<div class="mt-6 rounded bg-white px-8 pb-8 pt-6 shadow-md dark:bg-gray-800">
+  <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">Retrieved Quotation</h2>
+  <table class="w-full border-collapse border border-gray-300 mt-4 dark:border-gray-700">
     <thead>
       <tr>
-        <th class="border border-gray-300 p-2">ID</th>
-        <th class="border border-gray-300 p-2">Origin</th>
-        <th class="border border-gray-300 p-2">Destination</th>
-        <th class="border border-gray-300 p-2">Dimensions</th>
-        <th class="border border-gray-300 p-2">Weight</th>
-        <th class="border border-gray-300 p-2">Cost</th>
+        <th class="border border-gray-300 p-2 dark:border-gray-700">ID</th>
+        <th class="border border-gray-300 p-2 dark:border-gray-700">Origin</th>
+        <th class="border border-gray-300 p-2 dark:border-gray-700">Destination</th>
+        <th class="border border-gray-300 p-2 dark:border-gray-700">Dimensions</th>
+        <th class="border border-gray-300 p-2 dark:border-gray-700">Weight</th>
+        <th class="border border-gray-300 p-2 dark:border-gray-700">Cost</th>
       </tr>
     </thead>
     <tbody>
       <tr>
-        <td class="border border-gray-300 p-2">
+        <td class="border border-gray-300 p-2 dark:border-gray-700">
           {retrievedQuotation.id}
         </td>
-        <td class="border border-gray-300 p-2">
+        <td class="border border-gray-300 p-2 dark:border-gray-700">
           {retrievedQuotation.origin.city}, {retrievedQuotation.origin.countryCode}
         </td>
-        <td class="border border-gray-300 p-2">
+        <td class="border border-gray-300 p-2 dark:border-gray-700">
           {retrievedQuotation.destination.city}, {retrievedQuotation.destination.countryCode}
         </td>
-        <td class="border border-gray-300 p-2">
+        <td class="border border-gray-300 p-2 dark:border-gray-700">
           {retrievedQuotation.box.widthCm} x {retrievedQuotation.box.widthCm} x {retrievedQuotation.box.heightCm} cm
         </td>
-        <td class="border border-gray-300 p-2">{retrievedQuotation.box.weightG} g</td>
-        <td class="border border-gray-300 p-2">
+        <td class="border border-gray-300 p-2 dark:border-gray-700">{retrievedQuotation.box.weightG} g</td>
+        <td class="border border-gray-300 p-2 dark:border-gray-700">
           {formatAmount(retrievedQuotation.amountQuotedCents)}
         </td>
       </tr>
@@ -137,48 +137,45 @@
       method="POST"
       action="?/createQuotation"
       on:submit|preventDefault={handleSubmit}
-      class="mb-4 rounded bg-white px-8 pb-8 pt-6 shadow-md">
+      class="mb-4 rounded bg-white px-8 pb-8 pt-6 shadow-md dark:bg-gray-800">
       {#if error && error.field === "submit"}
-        <div class="mb-4 rounded bg-red-100 p-4 text-red-700" transition:fade>
+        <div class="mb-4 rounded bg-red-100 p-4 text-red-700 dark:bg-red-200 dark:text-red-800" transition:fade>
           {error.message}
         </div>
       {/if}
       <div class="grid grid-cols-2 gap-4">
         <!-- Origin Information -->
-        <div
-          class={error?.field === "origin"
-            ? "rounded border border-red-500 p-4"
-            : "p-4"}>
-          <h3 class="mb-2 font-bold text-gray-700">Pickup Location</h3>
+        <div class={error?.field === "origin" ? "rounded border border-red-500 p-4" : "p-4"}>
+          <h3 class="mb-2 font-bold text-gray-700 dark:text-gray-300">Pickup Location</h3>
           <div class="mb-4">
-            <label class="mb-2 block text-sm font-bold text-gray-700">
+            <label class="mb-2 block text-sm font-bold text-gray-700 dark:text-gray-200">
               Street Address
               <input
                 name="originAddress1"
                 type="text"
                 placeholder="1234 Main St"
-                class="w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow"
+                class="w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow dark:bg-gray-700 dark:text-gray-200"
                 required />
             </label>
           </div>
           <div class="mb-4">
-            <label class="mb-2 block text-sm font-bold text-gray-700">
+            <label class="mb-2 block text-sm font-bold text-gray-700 dark:text-gray-200">
               City
               <input
                 name="originCity"
                 type="text"
                 placeholder="San Francisco"
-                class="w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow"
+                class="w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow dark:bg-gray-700 dark:text-gray-200"
                 required />
             </label>
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div class="mb-4">
-              <label class="mb-2 block text-sm font-bold text-gray-700">
+              <label class="mb-2 block text-sm font-bold text-gray-700 dark:text-gray-200">
                 Country
                 <select
                   name="originCountry"
-                  class="w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow"
+                  class="w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow dark:bg-gray-700 dark:text-gray-200"
                   required>
                   <option value="US">United States</option>
                   <option value="CA">Canada</option>
@@ -187,13 +184,13 @@
               </label>
             </div>
             <div class="mb-4">
-              <label class="mb-2 block text-sm font-bold text-gray-700">
+              <label class="mb-2 block text-sm font-bold text-gray-700 dark:text-gray-200">
                 Postal Code
                 <input
                   name="originPostal"
                   type="text"
                   placeholder="94105"
-                  class="w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow"
+                  class="w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow dark:bg-gray-700 dark:text-gray-200"
                   required />
               </label>
             </div>
@@ -201,40 +198,37 @@
         </div>
 
         <!-- Destination Information -->
-        <div
-          class={error?.field === "destination"
-            ? "rounded border border-red-500 p-4"
-            : "p-4"}>
-          <h3 class="mb-2 font-bold text-gray-700">Delivery Location</h3>
+        <div class={error?.field === "destination" ? "rounded border border-red-500 p-4" : "p-4"}>
+          <h3 class="mb-2 font-bold text-gray-700 dark:text-gray-300">Delivery Location</h3>
           <div class="mb-4">
-            <label class="mb-2 block text-sm font-bold text-gray-700">
+            <label class="mb-2 block text-sm font-bold text-gray-700 dark:text-gray-200">
               Street Address
               <input
                 name="destAddress1"
                 type="text"
                 placeholder="5678 Market St"
-                class="w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow"
+                class="w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow dark:bg-gray-700 dark:text-gray-200"
                 required />
             </label>
           </div>
           <div class="mb-4">
-            <label class="mb-2 block text-sm font-bold text-gray-700">
+            <label class="mb-2 block text-sm font-bold text-gray-700 dark:text-gray-200">
               City
               <input
                 name="destCity"
                 type="text"
                 placeholder="New York"
-                class="w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow"
+                class="w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow dark:bg-gray-700 dark:text-gray-200"
                 required />
             </label>
           </div>
           <div class="grid grid-cols-2 gap-4">
             <div class="mb-4">
-              <label class="mb-2 block text-sm font-bold text-gray-700">
+              <label class="mb-2 block text-sm font-bold text-gray-700 dark:text-gray-200">
                 Country
                 <select
                   name="destCountry"
-                  class="w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow"
+                  class="w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow dark:bg-gray-700 dark:text-gray-200"
                   required>
                   <option value="US">United States</option>
                   <option value="CA">Canada</option>
@@ -243,13 +237,13 @@
               </label>
             </div>
             <div class="mb-4">
-              <label class="mb-2 block text-sm font-bold text-gray-700">
+              <label class="mb-2 block text-sm font-bold text-gray-700 dark:text-gray-200">
                 Postal Code
                 <input
                   name="destPostal"
                   type="text"
                   placeholder="10001"
-                  class="w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow"
+                  class="w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow dark:bg-gray-700 dark:text-gray-200"
                   required />
               </label>
             </div>
@@ -259,65 +253,53 @@
 
       <!-- Package Dimensions -->
       <div class="mt-6">
-        <h3 class="mb-2 font-bold">Package Dimensions</h3>
+        <h3 class="mb-2 font-bold text-gray-700 dark:text-gray-300">Package Dimensions</h3>
         <div class="grid grid-cols-4 gap-4">
-          <!-- <div class="mb-4">
-            <label class="mb-2 block text-sm font-bold text-gray-700">
-              Length (cm)
-              <input
-                name="length"
-                type="number"
-                min="1"
-                step="0.1"
-                class="w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow"
-                required />
-            </label>
-          </div> -->
           <div class="mb-4">
-            <label class="mb-2 block text-sm font-bold text-gray-700">
+            <label class="mb-2 block text-sm font-bold text-gray-700 dark:text-gray-200">
               Width (cm)
               <input
                 name="width"
                 type="number"
                 min="1"
                 step="0.1"
-                class="w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow"
+                class="w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow dark:bg-gray-700 dark:text-gray-200"
                 required />
             </label>
           </div>
           <div class="mb-4">
-            <label class="mb-2 block text-sm font-bold text-gray-700">
+            <label class="mb-2 block text-sm font-bold text-gray-700 dark:text-gray-200">
               Height (cm)
               <input
                 name="height"
                 type="number"
                 min="1"
                 step="0.1"
-                class="w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow"
+                class="w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow dark:bg-gray-700 dark:text-gray-200"
                 required />
             </label>
           </div>
           <div class="mb-4">
-            <label class="mb-2 block text-sm font-bold text-gray-700">
+            <label class="mb-2 block text-sm font-bold text-gray-700 dark:text-gray-200">
               Depth (cm)
               <input
                 name="depth"
                 type="number"
                 min="1"
                 step="0.1"
-                class="w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow"
+                class="w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow dark:bg-gray-700 dark:text-gray-200"
                 required />
             </label>
           </div>
           <div class="mb-4">
-            <label class="mb-2 block text-sm font-bold text-gray-700">
+            <label class="mb-2 block text-sm font-bold text-gray-700 dark:text-gray-200">
               Weight (g)
               <input
                 name="weight"
                 type="number"
                 min="0.1"
                 step="0.1"
-                class="w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow"
+                class="w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow dark:bg-gray-700 dark:text-gray-200"
                 required />
             </label>
           </div>
@@ -328,7 +310,7 @@
         <button
           type="submit"
           disabled={loading}
-          class="rounded bg-blue-500 px-6 py-2 font-bold text-white transition-colors hover:bg-blue-700 disabled:bg-blue-300">
+          class="w-full rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700">
           {loading ? "Processing..." : "Get Quote"}
         </button>
       </div>
@@ -338,34 +320,34 @@
 
 {#if lastQuotation}
     <div class="mt-6">
-      <h2 class="text-xl font-bold">Last Quotation</h2>
-      <table class="w-full border-collapse border border-gray-300 mt-4">
+      <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">Last Quotation</h2>
+      <table class="w-full border-collapse border border-gray-300 mt-4 dark:border-gray-700">
         <thead>
           <tr>
-            <th class="border border-gray-300 p-2">ID</th>
-            <th class="border border-gray-300 p-2">Origin</th>
-            <th class="border border-gray-300 p-2">Destination</th>
-            <th class="border border-gray-300 p-2">Dimensions</th>
-            <th class="border border-gray-300 p-2">Weight</th>
-            <th class="border border-gray-300 p-2">Cost</th>
+            <th class="border border-gray-300 p-2 dark:border-gray-700">ID</th>
+            <th class="border border-gray-300 p-2 dark:border-gray-700">Origin</th>
+            <th class="border border-gray-300 p-2 dark:border-gray-700">Destination</th>
+            <th class="border border-gray-300 p-2 dark:border-gray-700">Dimensions</th>
+            <th class="border border-gray-300 p-2 dark:border-gray-700">Weight</th>
+            <th class="border border-gray-300 p-2 dark:border-gray-700">Cost</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td class="border border-gray-300 p-2">
+            <td class="border border-gray-300 p-2 dark:border-gray-700">
               {lastQuotation.id}
             </td>
-            <td class="border border-gray-300 p-2">
+            <td class="border border-gray-300 p-2 dark:border-gray-700">
               {lastQuotation.origin.city}, {lastQuotation.origin.countryCode}
             </td>
-            <td class="border border-gray-300 p-2">
+            <td class="border border-gray-300 p-2 dark:border-gray-700">
               {lastQuotation.destination.city}, {lastQuotation.destination.countryCode}
             </td>
-            <td class="border border-gray-300 p-2">
+            <td class="border border-gray-300 p-2 dark:border-gray-700">
               {lastQuotation.box.widthCm} x {lastQuotation.box.widthCm} x {lastQuotation.box.heightCm} cm
             </td>
-            <td class="border border-gray-300 p-2">{lastQuotation.box.weightG} g</td>
-            <td class="border border-gray-300 p-2">
+            <td class="border border-gray-300 p-2 dark:border-gray-700">{lastQuotation.box.weightG} g</td>
+            <td class="border border-gray-300 p-2 dark:border-gray-700">
               {formatAmount(lastQuotation.amountQuotedCents)}
             </td>
           </tr>
