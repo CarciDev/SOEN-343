@@ -1,13 +1,30 @@
 import { PrismaClient } from "@prisma/client";
-import { redirect, fail, type Actions } from "@sveltejs/kit";
-import type { ServerLoad } from "@sveltejs/kit";
+import { fail, type Actions } from "@sveltejs/kit";
 import { geocodingService } from "$lib/config/GeocodingConfig";
-import { BoxRepository } from "$lib/domain/BoxRepository";
-import { EarthLocationRepository } from "$lib/domain/EarthLocationRepository";
 import { QuotationRepository } from "$lib/domain/QuotationRepository";
 import { _calculatePrice } from "../api/pricing/+server";
+import { json } from "@sveltejs/kit";
+import type { PageServerLoad } from "./$types";
 
 const prisma = new PrismaClient();
+
+export const load: PageServerLoad = async () => {
+  // Get the most recent quotation with all related data
+  const lastQuotation = await prisma.quotation.findFirst({
+    orderBy: {
+      createdAt: "desc",
+    },
+    include: {
+      origin: true,
+      destination: true,
+      box: true,
+    },
+  });
+
+  return {
+    lastQuotation,
+  };
+};
 
 export const actions = {
   createQuotation: async ({ request, locals }) => {
@@ -48,7 +65,6 @@ export const actions = {
 
       // Only proceed if both addresses are valid
       if (originResult.valid && destResult.valid) {
-        // Replace this with BoxRepository.save(box: Box)
         const box = await prisma.box.create({
           data: {
             depthCm: parseFloat(formData.get("depth") as string),
@@ -68,6 +84,7 @@ export const actions = {
             lng: originResult.lng,
           },
         });
+
         const destination = await prisma.earthLocation.create({
           data: {
             address1: formData.get("destAddress1") as string,
@@ -100,9 +117,19 @@ export const actions = {
           boxId: box.id,
         });
 
+        // Fetch the complete quotation with related data
+        const completeQuotation = await prisma.quotation.findUnique({
+          where: { id: quotation.id },
+          include: {
+            origin: true,
+            destination: true,
+            box: true,
+          },
+        });
+
         return {
           success: true,
-          quotationId: quotation.id,
+          quotation: completeQuotation,
         };
       }
 
