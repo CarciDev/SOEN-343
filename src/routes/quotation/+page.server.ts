@@ -2,6 +2,8 @@ import { PrismaClient } from "@prisma/client";
 import { fail, type Actions } from "@sveltejs/kit";
 import { geocodingService } from "$lib/config/GeocodingConfig";
 import { QuotationRepository } from "$lib/domain/QuotationRepository";
+import { EarthLocationRepository } from "$lib/domain/EarthLocationRepository";
+import { BoxRepository } from "$lib/domain/BoxRepository";
 import { _calculatePrice } from "../api/pricing/+server";
 import { json } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
@@ -65,35 +67,32 @@ export const actions = {
 
       // Only proceed if both addresses are valid
       if (originResult.valid && destResult.valid) {
-        const box = await prisma.box.create({
-          data: {
-            depthCm: parseFloat(formData.get("depth") as string),
-            widthCm: parseFloat(formData.get("width") as string),
-            heightCm: parseFloat(formData.get("height") as string),
-            weightG: parseFloat(formData.get("weight") as string),
-          },
+        const box = await BoxRepository.save({
+          // id: undefined,
+          depthCm: parseFloat(formData.get("depth") as string),
+          widthCm: parseFloat(formData.get("width") as string),
+          heightCm: parseFloat(formData.get("height") as string),
+          weightG: parseFloat(formData.get("weight") as string),
         });
 
-        const origin = await prisma.earthLocation.create({
-          data: {
-            address1: formData.get("originAddress1") as string,
-            city: formData.get("originCity") as string,
-            countryCode: formData.get("originCountry") as string,
-            postalCode: formData.get("originPostal") as string,
-            lat: originResult.lat,
-            lng: originResult.lng,
-          },
+        const origin = await EarthLocationRepository.save({
+          // id: undefined,
+          address1: formData.get("originAddress1") as string,
+          city: formData.get("originCity") as string,
+          countryCode: formData.get("originCountry") as string,
+          postalCode: formData.get("originPostal") as string,
+          lat: originResult.lat,
+          lng: originResult.lng,
         });
 
-        const destination = await prisma.earthLocation.create({
-          data: {
-            address1: formData.get("destAddress1") as string,
-            city: formData.get("destCity") as string,
-            countryCode: formData.get("destCountry") as string,
-            postalCode: formData.get("destPostal") as string,
-            lat: destResult.lat,
-            lng: destResult.lng,
-          },
+        const destination = await EarthLocationRepository.save({
+          // id: undefined,
+          address1: formData.get("destAddress1") as string,
+          city: formData.get("destCity") as string,
+          countryCode: formData.get("destCountry") as string,
+          postalCode: formData.get("destPostal") as string,
+          lat: destResult.lat,
+          lng: destResult.lng,
         });
 
         const shippingCost = await _calculatePrice(
@@ -110,11 +109,11 @@ export const actions = {
         );
 
         const quotation = await QuotationRepository.save({
-          id: undefined,
-          originId: origin.id,
-          destinationId: destination.id,
+          // id: undefined,
+          originId: origin.id!,
+          destinationId: destination.id!,
           amountQuotedCents: shippingCost,
-          boxId: box.id,
+          boxId: box.id!,
         });
 
         // Fetch the complete quotation with related data

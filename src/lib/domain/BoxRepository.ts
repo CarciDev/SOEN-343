@@ -10,11 +10,15 @@ export class BoxRepository {
       weightG: box.weightG,
     };
 
-    const savedBox = await prisma.box.upsert({
-      where: { id: box.id },
-      update: dataFields,
-      create: dataFields,
-    });
+    const savedBox = box.id
+      ? await prisma.box.upsert({
+          where: { id: box.id },
+          update: dataFields,
+          create: dataFields,
+        })
+      : await prisma.box.create({
+          data: dataFields,
+        });
 
     box.id = savedBox.id;
     box.createdAt = savedBox.createdAt;
