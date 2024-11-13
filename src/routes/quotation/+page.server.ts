@@ -58,7 +58,6 @@ export const actions = {
           },
         });
 
-        // Replace this with EarthLocationRepository.save(earthLocation: EarthLocation)
         const origin = await prisma.earthLocation.create({
           data: {
             address1: formData.get("originAddress1") as string,
@@ -69,8 +68,6 @@ export const actions = {
             lng: originResult.lng,
           },
         });
-
-        // Replace this with EarthLocationRepository.save(earthLocation: EarthLocation)
         const destination = await prisma.earthLocation.create({
           data: {
             address1: formData.get("destAddress1") as string,
@@ -95,7 +92,6 @@ export const actions = {
           destResult.countryCode as string,
         );
 
-        // Use QuotationRepository.save(quotation: Quotation)
         const quotation = await QuotationRepository.save({
           id: undefined,
           originId: origin.id,
