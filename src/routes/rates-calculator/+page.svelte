@@ -57,7 +57,12 @@
   async function redirectToQuotation() {
     console.log("Redirecting");
     // Not Good Practice:
-    window.location.href="/rates-calculator?quotationId=" + quotationId;
+    if (parseInt(quotationId) < 0 || !Number.isInteger(parseInt(quotationId))) {
+      error = { message: "Quotation ID must be a positive number", field: "retrieve" };
+      return;
+    } else {
+      window.location.href="/rates-calculator?quotationId=" + quotationId;
+    }
   }
 </script>
 
@@ -74,7 +79,9 @@
     <label class="mb-4 block text-sm font-bold text-gray-700 dark:text-gray-200">
       Quotation ID
       <input
-        type="text"
+        type="number"
+        required={true}
+        min="0"
         bind:value={quotationId}
         placeholder="Enter Quotation ID"
         class="w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow dark:bg-gray-700 dark:text-gray-200" />
