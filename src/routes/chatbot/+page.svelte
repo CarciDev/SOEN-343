@@ -1,6 +1,5 @@
 <script>
   import ChatBox from "$lib/components/ChatBox.svelte";
-  import "./ChatBox.css";
 </script>
 
 <main>

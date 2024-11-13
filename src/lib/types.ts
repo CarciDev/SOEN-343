@@ -1,23 +1,30 @@
-import type {
-  Quotation,
-  EarthLocation,
-  ShipmentTransaction,
-  Box,
-} from "@prisma/client";
+export interface EarthLocation {
+  id: string;
+  address1: string;
+  city: string;
+  countryCode: string;
+  postalCode: string;
+  lat: number;
+  lng: number;
+}
 
-export type QuotationWithRelations = Quotation & {
+export interface Box {
+  id: string;
+  widthCm: number;
+  heightCm: number;
+  depthCm: number;
+  weightG: number;
+}
+
+export interface Quotation {
+  id: string;
+  amountQuotedCents: number;
   origin: EarthLocation;
   destination: EarthLocation;
   box: Box;
-  shipmentTransaction: ShipmentTransaction | null;
-};
-
-export interface PageServerLoad {
-  (context: { locals: { user: { name: string } | null } }): Promise<{
-    props: { user: { name: string } | null };
-  }>;
+  createdAt?: Date;
 }
 
-export type PageData = {
-  lastQuotation: QuotationWithRelations | null;
-};
+export interface PageData {
+  lastQuotation: Quotation | null;
+}
