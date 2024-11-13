@@ -6,13 +6,16 @@ import { BoxRepository } from "$lib/domain/BoxRepository";
 import { EarthLocationRepository } from "$lib/domain/EarthLocationRepository";
 import { QuotationRepository } from "$lib/domain/QuotationRepository";
 import { _calculatePrice } from "../api/pricing/+server";
+import type { PageServerLoad } from "./$types";
 
 const prisma = new PrismaClient();
 
 export async function load({ url }) {
   const quotationId = url.searchParams.get("quotationId");
 
-  let retrievedQuotation;
+  let retrievedQuotation = null;
+  let errorMessage = null;
+
   if (quotationId !== null && quotationId !== "") {
     retrievedQuotation = await prisma.quotation.findUnique({
       where: { id: parseInt(quotationId, 10) },
@@ -23,8 +26,13 @@ export async function load({ url }) {
         shipmentTransaction: true,
       },
     });
+
+    if (!retrievedQuotation) {
+      errorMessage = "Quotation not found. Please check the ID and try again.";
+    }
   }
-  return { retrievedQuotation };
+
+  return { retrievedQuotation, errorMessage };
 }
 
 export const actions = {
@@ -98,7 +106,7 @@ export const actions = {
           { lat: originResult.lat, lng: originResult.lng },
           { lat: destResult.lat, lng: destResult.lng },
           {
-            depth: parseFloat(formData.get("length") as string),
+            depth: parseFloat(formData.get("depth") as string),
             width: parseFloat(formData.get("width") as string),
             height: parseFloat(formData.get("height") as string),
             weight: parseFloat(formData.get("weight") as string),

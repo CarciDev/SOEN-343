@@ -26,8 +26,11 @@ export class DefaultPricingStrategy implements PricingStrategy {
     const distanceFee = distance * .05; //Example: $0.00050 per km
 
     const volume = dimensions.depth * dimensions.width * dimensions.height;
+    // print out the values of the dimensions
+    console.log(`Depth: ${dimensions.depth}, width: ${dimensions.width}, height: ${dimensions.height}`);
     const weightFee = dimensions.weight * weightMultiplier;
     const volumeFee = volume * volumeMultiplier;
+    console.log(`Volume fee: ${volumeFee}, Weight fee: ${weightFee}`);
 
     return baseRate + weightFee + volumeFee + distanceFee;
   }
