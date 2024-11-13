@@ -67,12 +67,21 @@ export const actions = {
 
       // Only proceed if both addresses are valid
       if (originResult.valid && destResult.valid) {
+        let weightG = parseFloat(formData.get("weight") as string)
+        weightG = Math.ceil(weightG)
+        let depthCm = parseFloat(formData.get("depth") as string)
+        depthCm = Math.ceil(depthCm)
+        let widthCm = parseFloat(formData.get("width") as string)
+        widthCm = Math.ceil(widthCm)
+        let heightCm = parseFloat(formData.get("height") as string)
+        heightCm = Math.ceil(heightCm)
+
         const box = await BoxRepository.save({
           // id: undefined,
-          depthCm: parseFloat(formData.get("depth") as string),
-          widthCm: parseFloat(formData.get("width") as string),
-          heightCm: parseFloat(formData.get("height") as string),
-          weightG: parseFloat(formData.get("weight") as string),
+          depthCm,
+          widthCm,
+          heightCm,
+          weightG
         });
 
         const origin = await EarthLocationRepository.save({
