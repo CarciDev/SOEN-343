@@ -1,6 +1,7 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
-  import { invalidateAll } from "$app/navigation";
+  import type { PageData } from "$lib/types";
+  import { invalidateAll} from "$app/navigation";
   import { fade } from "svelte/transition";
 
   interface EarthLocation {
@@ -24,9 +25,11 @@
     amountQuotedCents: number;
   }
 
-  let showForm = true;
+  export let data: PageData;
+  let showForm = false;
   let error: { message: string; field?: string } | null = null;
   let loading = false;
+  let lastQuotation = data.lastQuotation;
   let currentQuotation: Quotation | null = null;
 
   function formatAmount(cents: number): string {
@@ -43,6 +46,7 @@
     const form = event.target as HTMLFormElement;
     const formData = new FormData(form);
 
+    //@ts-expect-error - FormData is not iterable
     return async ({ result, update }) => {
       loading = false;
 
@@ -67,6 +71,16 @@
     Create Shipping Quote
   </h1>
 
+  <div class="flex justify-end">
+    <button
+      class="rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700"
+      on:click={() => {
+        showForm = !showForm;
+        error = null;
+      }}>
+      {showForm ? "Hide Form" : "Show Form"}
+    </button>
+  </div>
   {#if currentQuotation}
     <div
       transition:fade
@@ -142,11 +156,11 @@
       </div>
     </div>
   {/if}
-
   {#if showForm}
     <div
       transition:fade
       class="mt-4 rounded bg-white p-6 shadow-md dark:bg-gray-800">
+      <!--handleSubmit has type issues-->
       <form method="POST" action="?/createQuotation" use:enhance={handleSubmit}>
         {#if error}
           <div
