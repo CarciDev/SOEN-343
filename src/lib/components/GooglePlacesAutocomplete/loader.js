@@ -1,14 +1,14 @@
-// @ts-nocheck
-let isLoadingLibrary = false
+// @ts-expect-error idk
+let isLoadingLibrary = false;
 
 /**
  * The list of callbacks, one from each GooglePlacesAutocomplete instance that requested the library before the library
  * had finished loading.
  */
-const callbacks = []
+const callbacks = [];
 
 function hasLoadedLibrary() {
-  return window.google && window.google.maps && window.google.maps.places
+  return window.google && window.google.maps && window.google.maps.places;
 }
 
 /**
@@ -29,34 +29,34 @@ function hasLoadedLibrary() {
  */
 export function loadGooglePlacesLibrary(apiKey, callback) {
   if (hasLoadedLibrary()) {
-    callback()
-    return
+    callback();
+    return;
   }
 
-  callback && callbacks.push(callback)
+  callback && callbacks.push(callback);
 
   if (isLoadingLibrary) {
-    return
+    return;
   }
 
-  isLoadingLibrary = true
+  isLoadingLibrary = true;
 
-  const element = document.createElement('script')
-  element.async = true
-  element.defer = true
-  element.onload = onLibraryLoaded
+  const element = document.createElement("script");
+  element.async = true;
+  element.defer = true;
+  element.onload = onLibraryLoaded;
   element.src = `https://maps.googleapis.com/maps/api/js?key=${encodeURIComponent(
-    apiKey
-  )}&libraries=places&callback=Function.prototype`
-  element.type = 'text/javascript'
+    apiKey,
+  )}&libraries=places&callback=Function.prototype`;
+  element.type = "text/javascript";
 
-  document.head.appendChild(element)
+  document.head.appendChild(element);
 }
 
 function onLibraryLoaded() {
-  isLoadingLibrary = false
-  let callback
+  isLoadingLibrary = false;
+  let callback;
   while ((callback = callbacks.pop())) {
-    callback()
+    callback();
   }
 }

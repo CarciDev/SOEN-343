@@ -1,10 +1,10 @@
 <script>
-  // @ts-nocheck
   import { PUBLIC_GEOCODING_API_KEY } from "$env/static/public";
   import { loadGooglePlacesLibrary } from "./loader.js";
   import { createEventDispatcher, onMount } from "svelte";
 
   let apiKey = PUBLIC_GEOCODING_API_KEY ? PUBLIC_GEOCODING_API_KEY : "apikey";
+  // @ts-expect-error options is undefined
   export let options = undefined;
   export let placeholder = undefined;
   export let value = "";
@@ -13,12 +13,17 @@
 
   const dispatch = createEventDispatcher();
 
+  // @ts-expect-error any type
   let inputField;
   $: selectedLocationName = value || "";
 
   onMount(() => {
     loadGooglePlacesLibrary(apiKey, () => {
+      // ???
+      // @ts-expect-error not made for ts
+      // eslint-disable-next-line no-undef
       const autocomplete = new google.maps.places.Autocomplete(
+        // @ts-expect-error no type info
         inputField,
         options,
       );
@@ -33,6 +38,7 @@
         if (hasLocationData(place)) {
           setSelectedLocation({
             place: place,
+            // @ts-expect-error no type info
             text: inputField.value,
           });
         }
@@ -43,23 +49,29 @@
   });
 
   function emptyLocationField() {
+    // @ts-expect-error no type info on params
     inputField.value = "";
     onChange();
   }
 
+  // @ts-expect-error no type info on params
   function hasLocationData(place) {
+    // @ts-expect-error no type info on params
     const fieldsToLookFor = (options &&
       options.fields?.indexOf("ALL") === -1 &&
       options.fields) || ["geometry"];
+    // eslint-disable-next-line no-prototype-builtins
     return place.hasOwnProperty(fieldsToLookFor[0]);
   }
 
   function onChange() {
+    // @ts-expect-error no type info
     if (inputField.value === "") {
       setSelectedLocation(null);
     }
   }
 
+  // @ts-expect-error no type info
   function onKeyDown(event) {
     const suggestionsAreVisible =
       document.getElementsByClassName("pac-item").length;
@@ -71,6 +83,7 @@
         if (!isSuggestionSelected) {
           selectFirstSuggestion();
         }
+        // @ts-expect-error no type info
       } else if (doesNotMatchSelectedLocation(inputField.value)) {
         setTimeout(emptyLocationField, 10);
       }
@@ -96,14 +109,17 @@
       code: "ArrowDown",
       keyCode: 40,
     });
+    // @ts-expect-error no parameter type info
     inputField.dispatchEvent(simulatedEvent);
   }
 
+  // @ts-expect-error no parameter type info
   function setSelectedLocation(data) {
     selectedLocationName = (data && data.text) || "";
     dispatch("place_changed", data);
   }
 
+  // @ts-expect-error no parameter type info
   function doesNotMatchSelectedLocation(value) {
     return selectedLocationName !== value;
   }
