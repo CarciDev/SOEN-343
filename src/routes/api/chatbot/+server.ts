@@ -5,6 +5,7 @@ import type { RequestHandler } from "@sveltejs/kit";
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY ? process.env.OPENAI_API_KEY : "apikey",
 });
+//@ts-expect-error configuration typing missing.
 const openai = new OpenAIApi(configuration);
 
 export const POST: RequestHandler = async ({ request }) => {
@@ -32,6 +33,7 @@ export const POST: RequestHandler = async ({ request }) => {
     return new Response(
       JSON.stringify({
         response: "Sorry, there was an error processing your request.",
+        //@ts-expect-error error typing missing.
         error: error.message || "Unknown error",
       }),
       {
