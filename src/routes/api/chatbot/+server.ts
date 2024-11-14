@@ -3,7 +3,7 @@ import Configuration from "openai";
 import type { RequestHandler } from "@sveltejs/kit";
 
 const configuration = new Configuration({
-  apiKey: process.env.OPENAI_API_KEY ? process.env.OPENAI_API_KEY : undefined,
+  apiKey: process.env.OPENAI_API_KEY ? process.env.OPENAI_API_KEY : "apikey",
 });
 const openai = new OpenAIApi(configuration);
 
