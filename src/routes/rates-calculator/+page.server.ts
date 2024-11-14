@@ -1,11 +1,4 @@
 import { PrismaClient } from "@prisma/client";
-import { fail, type Actions } from "@sveltejs/kit";
-import { geocodingService } from "$lib/config/GeocodingConfig";
-import { BoxRepository } from "$lib/domain/BoxRepository";
-import { EarthLocationRepository } from "$lib/domain/EarthLocationRepository";
-import { QuotationRepository } from "$lib/domain/QuotationRepository";
-import { _calculatePrice } from "../api/pricing/+server";
-
 const prisma = new PrismaClient();
 
 export async function load({ url }: { url: URL }) {
