@@ -15,6 +15,7 @@ jobs:
       DIRECT_DATABASE_URL: ${{ secrets.DIRECT_DATABASE_URL }}
       SESSION_SIGNING_KEY: ${{ secrets.SESSION_SIGNING_KEY }}
       EXEC_ENV: production
+      PUBLIC_GEOCODING_API_KEY: ${{ secrets.PUBLIC_GEOCODING_API_KEY }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3

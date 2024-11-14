@@ -18,6 +18,7 @@ jobs:
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
       SESSION_SIGNING_KEY: ${{ secrets.SESSION_SIGNING_KEY }}
       EXEC_ENV: ${{ vars.EXEC_ENV }}
+      PUBLIC_GEOCODING_API_KEY: ${{ secrets.PUBLIC_GEOCODING_API_KEY }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
