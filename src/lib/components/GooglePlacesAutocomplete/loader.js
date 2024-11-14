@@ -1,14 +1,14 @@
-// @ts-nocheck
-// @ts-expect-error idk
 let isLoadingLibrary = false;
 
 /**
  * The list of callbacks, one from each GooglePlacesAutocomplete instance that requested the library before the library
  * had finished loading.
  */
+// @ts-expect-error idk
 const callbacks = [];
 
 function hasLoadedLibrary() {
+  // @ts-expect-error idk
   return window.google && window.google.maps && window.google.maps.places;
 }
 
@@ -28,6 +28,7 @@ function hasLoadedLibrary() {
  * @param apiKey Your Google Places API Key
  * @param callback A callback (if you want to be notified when the library is available for use)
  */
+// @ts-expect-error idk
 export function loadGooglePlacesLibrary(apiKey, callback) {
   if (hasLoadedLibrary()) {
     callback();
@@ -57,6 +58,7 @@ export function loadGooglePlacesLibrary(apiKey, callback) {
 function onLibraryLoaded() {
   isLoadingLibrary = false;
   let callback;
+  // @ts-expect-error idk
   while ((callback = callbacks.pop())) {
     callback();
   }
