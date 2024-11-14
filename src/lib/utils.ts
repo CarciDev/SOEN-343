@@ -1,4 +1,5 @@
 import { getModeUserPrefers } from "@skeletonlabs/skeleton";
+import type { TrackingStatus } from "./domain/TrackingStatus";
 
 export function centsToDollars(price: number): string {
   // Divide by 100 to convert cents to dollars
@@ -12,6 +13,21 @@ export function formatDbReservationDate(date: Date): string {
   const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed
   const day = String(date.getDate()).padStart(2, "0");
   return `${year}-${month}-${day}`;
+}
+
+export function formatTrackingStatus(ts: TrackingStatus | string): string {
+  switch (ts) {
+    case "PICKED_UP_AT_ORIGIN":
+      return "Picked up at origin";
+    case "FACILITY_TRANSIT":
+      return "Transit through facility";
+    case "OUT_FOR_DELIVERY":
+      return "On delivery vehicle";
+    case "DELIVERED":
+      return "Delivered";
+    default:
+      return "Other status";
+  }
 }
 
 export async function setFlatpickrTheme() {
@@ -54,4 +70,18 @@ export function formatAmount(cents: number): string {
     style: "currency",
     currency: "CAD",
   });
+  
+/**
+ * Converts an ArrayBuffer to a Node.js Buffer.
+ *
+ * @param {ArrayBuffer} ab - The ArrayBuffer to convert.
+ * @returns {Buffer} - A new Buffer containing the same data as the ArrayBuffer.
+ */
+export function toBuffer(ab: ArrayBuffer): Buffer {
+  const buf = Buffer.alloc(ab.byteLength);
+  const view = new Uint8Array(ab); // Create an array view over the ArrayBuffer to access its data
+  for (let i = 0; i < buf.length; i++) {
+    buf[i] = view[i];
+  } // Copy each byte to the Buffer
+  return buf;
 }

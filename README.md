@@ -1,23 +1,27 @@
 # SvelteShip-SOEN-343
 
+SOEN 343 Fall 2024, Concordia University – Section HH / Lab Section HI-X
+
+TA: Beavan Joe Mathias
+
 ## About
 
-This project is a web application built with SvelteKit for package delivery
-services.
+This project, aptly named SvelteShipSolutions, is a web application built with
+SvelteKit for package delivery services.
 
 > Please note that this project is for educational purposes and is part of a
 > university assignment. It's not intended for commercial use.
 
 ## Team Members
 
-| Name             | Student ID |
-| ---------------- | ---------- |
-| Giuliano Verdone | 40252190   |
-| Brian Tkatch     | 40191139   |
-| Jeremy Vieira    | 40246737   |
-| Laurenz Gomez    | 40247966   |
-| David Carciente  | 40247907   |
-| Nirav Patel      | 40248940   |
+| Name                        | Student ID | Sub-Team No. |
+| --------------------------- | ---------- | ------------ |
+| Giuliano Verdone            | 40252190   | 3            |
+| Brian Tkatch                | 40191139   | 3            |
+| Jeremy Vieira               | 40246737   | 1            |
+| Laurenz Gomez               | 40247966   | 1            |
+| David Carciente (Team Lead) | 40247907   | 2            |
+| Nirav Patel                 | 40248940   | 2            |
 
 ## VSCode Setup
 
@@ -58,17 +62,20 @@ file in the project's root.
 
 The following variables can be configured:
 
-| VAR                 | DESC                                                 | DEFAULT                                                                                 |
-| ------------------- | ---------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| DB_HOST             | The dev database host                                | `localhost`                                                                             |
-| DB_USER             | The dev database username                            | `devuser`                                                                               |
-| DB_PASSWORD         | The dev database password                            | `supersecret`                                                                           |
-| DB_NAME             | The dev database name                                | `devdb`                                                                                 |
-| DB_PORT             | The dev database port                                | `5433`                                                                                  |
-| DATABASE_URL        | The database URL (used by Prisma)                    | `postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?schema=public` |
-| DIRECT_DATABASE_URL | Used in development environment to keep Prisma happy | `postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?schema=public` |
-| EXEC_ENV            | Current execution environment                        | `development`                                                                           |
-| SESSION_SIGNING_KEY | 32 random bytes in hex format, used to sign sessions | `6bd8a14a0d6333b239ae45260618f09cae07c45bef34d4b1c21e7d64d13254b0`                      |
+| VAR                   | DESC                                                 | DEFAULT                                                                                 |
+| --------------------- | ---------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| PUBLIC_BASE_URL       | The base URL of the project                          | `http:/localhost:5173`                                                                  |
+| DB_HOST               | The dev database host                                | `localhost`                                                                             |
+| DB_USER               | The dev database username                            | `devuser`                                                                               |
+| DB_PASSWORD           | The dev database password                            | `supersecret`                                                                           |
+| DB_NAME               | The dev database name                                | `devdb`                                                                                 |
+| DB_PORT               | The dev database port                                | `5433`                                                                                  |
+| DATABASE_URL          | The database URL (used by Prisma)                    | `postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?schema=public` |
+| DIRECT_DATABASE_URL   | Used in development environment to keep Prisma happy | `postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?schema=public` |
+| EXEC_ENV              | Current execution environment                        | `development`                                                                           |
+| SESSION_SIGNING_KEY   | 32 random bytes in hex format, used to sign sessions | `6bd8a14a0d6333b239ae45260618f09cae07c45bef34d4b1c21e7d64d13254b0`                      |
+| STRIPE_SECRET_KEY     | Prefixed by sk_test\_, used to call the Stripe API   | `{YOUR_STRIPE_SECRET_KEY}`                                                              |
+| STRIPE_SIGNING_SECRET | Prefixed by whsec\_, used to verify event signatures | `{YOUR_STRIPE_WEBHOOK_SIGNING_SECRET}`                                                  |
 
 ### Starting the Dev Environment
 
@@ -162,6 +169,100 @@ running:
 ```bash
 npx prisma studio
 ```
+
+### Stripe
+
+#### Setup Stripe CLI
+
+Please follow the [Stripe CLI Install Docs](https://stripe.com/docs/stripe-cli),
+specifically steps 1 (Install the Stripe CLI) and 2 (Log in to the CLI).
+Installation instructions are listed for various operating systems.
+
+The next section attempts to address issues that WSL2 users may have encountered
+when attempting to get the Stripe CLI to work properly.
+
+##### Stripe CLI WSL Note
+
+If you're not using WSL, please move onto the next section.
+
+A few versions ago, Stripe made changes to the CLI that broke it for WSL2 users.
+A possible 3-step fix is provided below.
+
+First, create a ".wslconfig" file in your Windows home folder, which is usually
+at "C:\Users\<Your-Windows-User-Name>". You should also be able to open your
+Windows home folder by entering %USERPROFILE% to Windows File Explorer.
+
+Second, disable the WSL GUI by opening the ".wslconfig" file in a text editor
+and add the following lines:
+
+```bash
+[wsl2]
+guiApplications=false
+```
+
+Third, restart/shut down WSL by entering the following command in either Command
+Prompt or PowerShell:
+
+```bash
+wsl --shutdown
+```
+
+Finally, to start WSL again:
+
+```bash
+wsl
+```
+
+This should have fixed issues for WSL2 users.
+
+#### Reveal a secret API key for test mode
+
+In test mode, you can reveal a secret API key as many times as you want.
+
+To reveal a secret key in test mode:
+
+1.  In the Developers Dashboard, select the
+    [API keys](https://dashboard.stripe.com/test/apikeys) tab.
+2.  In the **Standard keys** list, in the **Secret key** row, click **Reveal
+    test key**.
+3.  Copy the key value by clicking it.
+4.  Save the key value, which can then be assigned as the value to your
+    STRIPE_SECRET_KEY environment variable.
+5.  Click **Hide test key**.
+
+#### Forward Stripe Webhooks
+
+If you haven't done so already, login to your Stripe account via the CLI:
+
+```bash
+stripe login
+```
+
+Next, enter the command below to forward webhooks to the local server (this way,
+there's no need to setup Ngrok or a public URL for local development):
+
+```bash
+stripe listen --forward-to localhost:5173/api/stripe/webhook
+```
+
+Finally, you should see a response message along the lines of: "Ready! [...]
+Your webhook signing secret is {whsec_WEBHOOK_SIGNING_SECRET}". Please copy the
+entire webhook signing secret and set it as your STRIPE_SIGNING_SECRET
+environment variable.
+
+> **Note:** this signing secret expires after 90 days, after which you'll have
+> to replace your STRIPE_SIGNING_SECRET environment variable.
+
+Much like the having a terminal dedicated for running the Docker container or
+the development server, you'll have one running for to forward Stripe webhooks.
+
+#### Test Mode
+
+Finally, please have a look through the Stripe docs for test mode:
+https://docs.stripe.com/test-mode. A key takeaway is that the test card number
+for Visa credit card is "4242424242424242", with a CVC if any 3 digits and a
+date with any future data. This test card will be useful for developers in
+simulating a successful payment scenario.
 
 ### Before Merging
 

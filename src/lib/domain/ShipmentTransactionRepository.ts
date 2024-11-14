@@ -3,6 +3,16 @@ import { ShipmentTransaction } from "./ShipmentTransaction";
 
 export class ShipmentTransactionRepository {
   static async save(shipmentTransaction: ShipmentTransaction) {
+    const quotationExists = await prisma.quotation.findUnique({
+      where: { id: shipmentTransaction.quotationId },
+    });
+
+    if (!quotationExists) {
+      throw new Error(
+        `Quotation with id ${shipmentTransaction.quotationId} does not exist.`,
+      );
+    }
+
     const dataFields = {
       trackingNumber: shipmentTransaction.trackingNumber,
       quotationId: shipmentTransaction.quotationId,
@@ -12,7 +22,9 @@ export class ShipmentTransactionRepository {
     };
 
     const savedTransaction = await prisma.shipmentTransaction.upsert({
-      where: { id: shipmentTransaction.id },
+      where: {
+        trackingNumber: shipmentTransaction.trackingNumber || undefined,
+      }, // originally where: { id: shipmentTransaction.id },
       update: dataFields,
       create: dataFields,
     });
@@ -53,5 +65,22 @@ export class ShipmentTransactionRepository {
     });
     if (dbResult) return await this.findById(dbResult.id);
     return null;
+  }
+
+  static async findByShipperId(id: number): Promise<ShipmentTransaction[]> {
+    const dbResult = await prisma.shipmentTransaction.findMany({
+      select: { id: true },
+      where: { shipperId: id },
+    });
+    if (dbResult) {
+      const returnData: ShipmentTransaction[] = [];
+      for (const resultItem of dbResult) {
+        if (!resultItem.id) continue;
+        const shipmentTransaction = await this.findById(resultItem.id);
+        if (shipmentTransaction) returnData.push(shipmentTransaction);
+      }
+      return returnData;
+    }
+    return [];
   }
 }

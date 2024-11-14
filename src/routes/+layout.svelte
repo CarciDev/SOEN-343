@@ -46,6 +46,7 @@
   import HomeIcon from "$lib/icons/HomeIcon.svelte";
   import ProfilePopup from "$lib/components/ProfilePopup.svelte";
   import NavBar from "$lib/components/NavBar.svelte";
+  import ClipboardListIcon from "$lib/icons/ClipboardListIcon.svelte";
 
   storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
 
@@ -77,6 +78,11 @@
 
   const links: Link[] = [
     { name: "Home", href: "/", icon: HomeIcon as SvelteComponent },
+    {
+      name: "Track",
+      href: "/track",
+      icon: ClipboardListIcon as SvelteComponent,
+    },
   ];
 </script>
 
