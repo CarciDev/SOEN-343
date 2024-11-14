@@ -1,38 +1,18 @@
 <script lang="ts">
-  //@ts-nocheck
   import { enhance } from "$app/forms";
   import type { PageData } from "$lib/types";
   import { invalidateAll } from "$app/navigation";
   import { fade } from "svelte/transition";
   import GooglePlacesAutocomplete from "$lib/components/GooglePlacesAutocomplete/GooglePlacesAutocomplete.svelte";
 
-  interface EarthLocation {
-    address1: string;
-    city: string;
-    countryCode: string;
-    postalCode: string;
-  }
-
-  interface Box {
-    widthCm: number;
-    heightCm: number;
-    depthCm: number;
-    weightG: number;
-  }
-
-  interface Quotation {
-    origin: EarthLocation;
-    destination: EarthLocation;
-    box: Box;
-    amountQuotedCents: number;
-  }
-
   export const data: PageData = {
     lastQuotation: null,
   };
   let showForm = false;
+  // @ts-expect-error null
   let error = null;
   let loading = false;
+  // @ts-expect-error null
   let currentQuotation = null;
 
   function formatAmount(cents) {
