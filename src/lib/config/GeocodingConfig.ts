@@ -14,7 +14,7 @@ export const geocodingService = {
     address: string,
     city: string,
     country: string,
-    postal: string
+    postal: string,
   ): Promise<GeocodingResponse> => {
     // Replace spaces in each part with "+"
     const formattedAddress = address.replace(/\s+/g, "+");
@@ -38,7 +38,7 @@ export const geocodingService = {
             address: fullAddress,
             key: process.env.GEOCODING_API_KEY,
           },
-        }
+        },
       );
 
       // Check API response status
@@ -78,7 +78,7 @@ export const geocodingService = {
     lat1: number,
     lng1: number,
     lat2: number,
-    lng2: number
+    lng2: number,
   ): Promise<number> {
     try {
       const R = 6371e3; // metres
