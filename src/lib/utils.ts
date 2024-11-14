@@ -70,7 +70,8 @@ export function formatAmount(cents: number): string {
     style: "currency",
     currency: "CAD",
   });
-  
+}
+
 /**
  * Converts an ArrayBuffer to a Node.js Buffer.
  *
