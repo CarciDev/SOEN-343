@@ -173,7 +173,7 @@
     <button
       class="rounded bg-green-500 px-4 py-2 text-white transition-colors hover:bg-green-600"
       on:click={() => {
-        window.location.href = "/payment?quotationId=" + retrievedQuotation.id;
+        window.location.href = "/make-payment" + `?quotationId=${retrievedQuotation?.id}`;
       }}>
       Proceed to Payment
     </button>
