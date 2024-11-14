@@ -73,7 +73,7 @@
   }
 
   async function redirectToQuotation() {
-    console.log("Redirecting");
+    console.log("Redirecting to Quotation");
     if (parseInt(quotationId) < 0 || !Number.isInteger(parseInt(quotationId))) {
       error = {
         message: "Quotation ID must be a positive number",
@@ -146,10 +146,18 @@
             {retrievedQuotation.id}
           </td>
           <td class="border border-gray-300 p-2 dark:border-gray-700">
+            {retrievedQuotation.origin.address1}
+            <br>
+            {retrievedQuotation.origin.postalCode}
+            <br>
             {retrievedQuotation.origin.city}, {retrievedQuotation.origin
               .countryCode}
           </td>
           <td class="border border-gray-300 p-2 dark:border-gray-700">
+            {retrievedQuotation.destination.address1}
+            <br>
+            {retrievedQuotation.destination.postalCode}
+            <br>
             {retrievedQuotation.destination.city}, {retrievedQuotation
               .destination.countryCode}
           </td>
