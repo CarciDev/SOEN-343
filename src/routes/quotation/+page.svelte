@@ -1,7 +1,7 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
   import type { PageData } from "$lib/types";
-  import { invalidateAll} from "$app/navigation";
+  import { invalidateAll } from "$app/navigation";
   import { fade } from "svelte/transition";
 
   interface EarthLocation {
@@ -25,11 +25,12 @@
     amountQuotedCents: number;
   }
 
-  export let data: PageData;
+  export const data: PageData = {
+    lastQuotation: null,
+  };
   let showForm = false;
   let error: { message: string; field?: string } | null = null;
   let loading = false;
-  let lastQuotation = data.lastQuotation;
   let currentQuotation: Quotation | null = null;
 
   function formatAmount(cents: number): string {
@@ -39,12 +40,9 @@
     });
   }
 
-  async function handleSubmit(event: SubmitEvent) {
+  async function handleSubmit() {
     loading = true;
     error = null;
-
-    const form = event.target as HTMLFormElement;
-    const formData = new FormData(form);
 
     //@ts-expect-error - FormData is not iterable
     return async ({ result, update }) => {

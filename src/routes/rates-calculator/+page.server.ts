@@ -1,16 +1,14 @@
-import { PrismaClient, type Quotation } from "@prisma/client";
+import { PrismaClient } from "@prisma/client";
 import { fail, type Actions } from "@sveltejs/kit";
-import type { ServerLoad } from "@sveltejs/kit";
 import { geocodingService } from "$lib/config/GeocodingConfig";
 import { BoxRepository } from "$lib/domain/BoxRepository";
 import { EarthLocationRepository } from "$lib/domain/EarthLocationRepository";
 import { QuotationRepository } from "$lib/domain/QuotationRepository";
 import { _calculatePrice } from "../api/pricing/+server";
-import type { PageServerLoad } from "./$types";
 
 const prisma = new PrismaClient();
 
-export async function load({ url }) {
+export async function load({ url }: { url: URL }) {
   const quotationId = url.searchParams.get("quotationId");
 
   let retrievedQuotation = null;
@@ -36,7 +34,7 @@ export async function load({ url }) {
 }
 
 export const actions = {
-  createQuotation: async ({ request, locals }) => {
+  createQuotation: async ({ request }) => {
     const formData = await request.formData();
 
     try {
@@ -88,8 +86,8 @@ export const actions = {
           city: formData.get("originCity") as string,
           countryCode: formData.get("originCountry") as string,
           postalCode: formData.get("originPostal") as string,
-          lat: originResult.lat,
-          lng: originResult.lng,
+          lat: originResult.lat!,
+          lng: originResult.lng!,
         });
 
         const destination = await EarthLocationRepository.save({
@@ -98,20 +96,22 @@ export const actions = {
           city: formData.get("destCity") as string,
           countryCode: formData.get("destCountry") as string,
           postalCode: formData.get("destPostal") as string,
-          lat: destResult.lat,
-          lng: destResult.lng,
+          lat: destResult.lat!,
+          lng: destResult.lng!,
         });
 
         const shippingCost = await _calculatePrice(
-          { lat: originResult.lat, lng: originResult.lng },
-          { lat: destResult.lat, lng: destResult.lng },
+          { lat: originResult.lat!, lng: originResult.lng! },
+          { lat: destResult.lat!, lng: destResult.lng! },
           {
             depth: parseFloat(formData.get("depth") as string),
             width: parseFloat(formData.get("width") as string),
             height: parseFloat(formData.get("height") as string),
             weight: parseFloat(formData.get("weight") as string),
           },
+          //@ts-expect-error - countryCode is a string
           originResult.countryCode as string,
+          //@ts-expect-error - countryCode is a string
           destResult.countryCode as string,
         );
 
@@ -121,6 +121,7 @@ export const actions = {
           destinationId: destination.id!,
           amountQuotedCents: shippingCost,
           boxId: box.id!,
+          etaDays: 2,
         });
 
         // Fetch the complete quotation with related data

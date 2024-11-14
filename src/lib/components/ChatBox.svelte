@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-
   let userInput = "";
   let messages: { sender: "user" | "bot"; text: string }[] = [];
 

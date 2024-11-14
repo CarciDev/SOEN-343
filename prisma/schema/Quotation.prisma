@@ -12,6 +12,6 @@ model Quotation {
   etaDays           Int @default(2)
   box               Box @relation(fields: [boxId], references: [id])
   boxId             Int
-  
+
   shipmentTransaction ShipmentTransaction?
 }

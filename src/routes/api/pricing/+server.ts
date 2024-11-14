@@ -1,4 +1,4 @@
-import { PricingContext } from './PricingContext';
+import { PricingContext } from "./PricingContext";
 
 const pricingContext = new PricingContext();
 
@@ -7,7 +7,13 @@ export async function _calculatePrice(
   destCoords: { lat: number; lng: number },
   dimensions: { depth: number; width: number; height: number; weight: number },
   originCountryCode: string,
-  destinationCountryCode: string
+  destinationCountryCode: string,
 ): Promise<number> {
-  return pricingContext.calculatePrice(originCoords, destCoords, dimensions, originCountryCode, destinationCountryCode);
+  return pricingContext.calculatePrice(
+    originCoords,
+    destCoords,
+    dimensions,
+    originCountryCode,
+    destinationCountryCode,
+  );
 }

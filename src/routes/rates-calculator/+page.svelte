@@ -4,36 +4,20 @@
   import { invalidateAll } from "$app/navigation";
   import { fade } from "svelte/transition";
 
-  interface EarthLocation {
-    address1: string;
-    city: string;
-    countryCode: string;
-    postalCode: string;
-  }
-
-  interface Box {
-    widthCm: number;
-    heightCm: number;
-    depthCm: number;
-    weightG: number;
-  }
-
-  interface Quotation {
-    origin: EarthLocation;
-    destination: EarthLocation;
-    box: Box;
-    amountQuotedCents: number;
-  }
-
   export let data: PageData;
   let showForm = false;
   let error: { message: string; field?: string } | null = null;
   let loading = false;
   let lastQuotation: {
-    id: any;
-    origin: { city: any; countryCode: any };
-    destination: { city: any; countryCode: any };
-    box: { widthCm: any; depthCm: any; heightCm: any; weightG: any };
+    id: number;
+    origin: { city: string; countryCode: number };
+    destination: { city: string; countryCode: number };
+    box: {
+      widthCm: number;
+      depthCm: number;
+      heightCm: number;
+      weightG: number;
+    };
     amountQuotedCents: number;
   };
   let quotationId = "";
@@ -47,14 +31,24 @@
     });
   }
 
-  async function handleSubmit(event: SubmitEvent) {
+  async function handleSubmit() {
     loading = true;
     error = null;
 
-    const form = event.target as HTMLFormElement;
-    const formData = new FormData(form);
-
-    return async ({ result, update }) => {
+    return async ({
+      result,
+      update,
+    }: {
+      result: {
+        type: string;
+        data?: {
+          message?: string;
+          field?: string;
+          quotation?: typeof retrievedQuotation;
+        };
+      };
+      update: () => Promise<void>;
+    }): Promise<void> => {
       loading = false;
 
       if (result.type === "failure") {
@@ -147,17 +141,17 @@
           </td>
           <td class="border border-gray-300 p-2 dark:border-gray-700">
             {retrievedQuotation.origin.address1}
-            <br>
+            <br />
             {retrievedQuotation.origin.postalCode}
-            <br>
+            <br />
             {retrievedQuotation.origin.city}, {retrievedQuotation.origin
               .countryCode}
           </td>
           <td class="border border-gray-300 p-2 dark:border-gray-700">
             {retrievedQuotation.destination.address1}
-            <br>
+            <br />
             {retrievedQuotation.destination.postalCode}
-            <br>
+            <br />
             {retrievedQuotation.destination.city}, {retrievedQuotation
               .destination.countryCode}
           </td>
@@ -181,7 +175,8 @@
     <button
       class="rounded bg-green-500 px-4 py-2 text-white transition-colors hover:bg-green-600"
       on:click={() => {
-        window.location.href = "/make-payment" + `?quotationId=${retrievedQuotation?.id}`;
+        window.location.href =
+          "/make-payment" + `?quotationId=${retrievedQuotation?.id}`;
       }}>
       Proceed to Payment
     </button>
@@ -202,176 +197,174 @@
 {/if}
 
 {#if showForm}
-<div
-transition:fade
-class="mt-4 rounded bg-white p-6 shadow-md dark:bg-gray-800">
-<form method="POST" action="?/createQuotation" use:enhance={handleSubmit}>
-  {#if error}
-    <div
-      class="alert-error alert mt-2 text-red-600 dark:text-red-400"
-      transition:fade>
-      {error.message}
-    </div>
-  {/if}
+  <div
+    transition:fade
+    class="mt-4 rounded bg-white p-6 shadow-md dark:bg-gray-800">
+    <form method="POST" action="?/createQuotation" use:enhance={handleSubmit}>
+      {#if error}
+        <div
+          class="alert-error alert mt-2 text-red-600 dark:text-red-400"
+          transition:fade>
+          {error.message}
+        </div>
+      {/if}
 
-  <div class="grid grid-cols-2 gap-4">
-    <!-- Origin Information -->
-    <div class={error?.field === "origin" ? "border-red-500 p-4" : "p-4"}>
-      <h3 class="mb-2 font-bold text-gray-700 dark:text-gray-300">
-        Pickup Location
-      </h3>
-      <label class="form-label text-gray-800 dark:text-gray-200">
-        Street Address
-        <input
-          name="originAddress1"
-          type="text"
-          placeholder="1234 Main St"
-          class="form-input bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
-          required />
-      </label>
-      <label class="form-label text-gray-800 dark:text-gray-200">
-        City
-        <input
-          name="originCity"
-          type="text"
-          placeholder="San Francisco"
-          class="form-input bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
-          required />
-      </label>
       <div class="grid grid-cols-2 gap-4">
-        <label class="form-label text-gray-800 dark:text-gray-200">
-          Country
-          <select
-            name="originCountry"
-            class="form-select bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
-            required>
-            <option value="US">United States</option>
-            <option value="CA">Canada</option>
-            <option value="MX">Mexico</option>
-          </select>
-        </label>
-        <label class="form-label text-gray-800 dark:text-gray-200">
-          Postal Code
-          <input
-            name="originPostal"
-            type="text"
-            placeholder="94105"
-            class="form-input bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
-            required />
-        </label>
+        <!-- Origin Information -->
+        <div class={error?.field === "origin" ? "border-red-500 p-4" : "p-4"}>
+          <h3 class="mb-2 font-bold text-gray-700 dark:text-gray-300">
+            Pickup Location
+          </h3>
+          <label class="form-label text-gray-800 dark:text-gray-200">
+            Street Address
+            <input
+              name="originAddress1"
+              type="text"
+              placeholder="1234 Main St"
+              class="form-input bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
+              required />
+          </label>
+          <label class="form-label text-gray-800 dark:text-gray-200">
+            City
+            <input
+              name="originCity"
+              type="text"
+              placeholder="San Francisco"
+              class="form-input bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
+              required />
+          </label>
+          <div class="grid grid-cols-2 gap-4">
+            <label class="form-label text-gray-800 dark:text-gray-200">
+              Country
+              <select
+                name="originCountry"
+                class="form-select bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
+                required>
+                <option value="US">United States</option>
+                <option value="CA">Canada</option>
+                <option value="MX">Mexico</option>
+              </select>
+            </label>
+            <label class="form-label text-gray-800 dark:text-gray-200">
+              Postal Code
+              <input
+                name="originPostal"
+                type="text"
+                placeholder="94105"
+                class="form-input bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
+                required />
+            </label>
+          </div>
+        </div>
+
+        <!-- Destination Information -->
+        <div
+          class={error?.field === "destination" ? "border-red-500 p-4" : "p-4"}>
+          <h3 class="mb-2 font-bold text-gray-700 dark:text-gray-300">
+            Delivery Location
+          </h3>
+          <label class="form-label text-gray-800 dark:text-gray-200">
+            Street Address
+            <input
+              name="destAddress1"
+              type="text"
+              placeholder="5678 Market St"
+              class="form-input bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
+              required />
+          </label>
+          <label class="form-label text-gray-800 dark:text-gray-200">
+            City
+            <input
+              name="destCity"
+              type="text"
+              placeholder="New York"
+              class="form-input bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
+              required />
+          </label>
+          <div class="grid grid-cols-2 gap-4">
+            <label class="form-label text-gray-800 dark:text-gray-200">
+              Country
+              <select
+                name="destCountry"
+                class="form-select bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
+                required>
+                <option value="US">United States</option>
+                <option value="CA">Canada</option>
+                <option value="MX">Mexico</option>
+              </select>
+            </label>
+            <label class="form-label text-gray-800 dark:text-gray-200">
+              Postal Code
+              <input
+                name="destPostal"
+                type="text"
+                placeholder="10001"
+                class="form-input bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
+                required />
+            </label>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <!-- Destination Information -->
-    <div
-      class={error?.field === "destination"
-        ? "border-red-500 p-4"
-        : "p-4"}>
-      <h3 class="mb-2 font-bold text-gray-700 dark:text-gray-300">
-        Delivery Location
-      </h3>
-      <label class="form-label text-gray-800 dark:text-gray-200">
-        Street Address
-        <input
-          name="destAddress1"
-          type="text"
-          placeholder="5678 Market St"
-          class="form-input bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
-          required />
-      </label>
-      <label class="form-label text-gray-800 dark:text-gray-200">
-        City
-        <input
-          name="destCity"
-          type="text"
-          placeholder="New York"
-          class="form-input bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
-          required />
-      </label>
-      <div class="grid grid-cols-2 gap-4">
-        <label class="form-label text-gray-800 dark:text-gray-200">
-          Country
-          <select
-            name="destCountry"
-            class="form-select bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
-            required>
-            <option value="US">United States</option>
-            <option value="CA">Canada</option>
-            <option value="MX">Mexico</option>
-          </select>
-        </label>
-        <label class="form-label text-gray-800 dark:text-gray-200">
-          Postal Code
-          <input
-            name="destPostal"
-            type="text"
-            placeholder="10001"
-            class="form-input bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
-            required />
-        </label>
+      <!-- Package Dimensions -->
+      <div class="mt-6">
+        <h3 class="mb-2 font-bold text-gray-700 dark:text-gray-300">
+          Package Dimensions
+        </h3>
+        <div class="grid grid-cols-4 gap-4">
+          <label class="form-label text-gray-800 dark:text-gray-200">
+            Width (cm)
+            <input
+              name="width"
+              type="number"
+              min="1"
+              step="0.1"
+              class="form-input bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
+              required />
+          </label>
+          <label class="form-label text-gray-800 dark:text-gray-200">
+            Height (cm)
+            <input
+              name="height"
+              type="number"
+              min="1"
+              step="0.1"
+              class="form-input bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
+              required />
+          </label>
+          <label class="form-label text-gray-800 dark:text-gray-200">
+            Depth (cm)
+            <input
+              name="depth"
+              type="number"
+              min="1"
+              step="0.1"
+              class="form-input bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
+              required />
+          </label>
+          <label class="form-label text-gray-800 dark:text-gray-200">
+            Weight (g)
+            <input
+              name="weight"
+              type="number"
+              min="0.1"
+              step="0.1"
+              class="form-input bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
+              required />
+          </label>
+        </div>
       </div>
-    </div>
-  </div>
 
-  <!-- Package Dimensions -->
-  <div class="mt-6">
-    <h3 class="mb-2 font-bold text-gray-700 dark:text-gray-300">
-      Package Dimensions
-    </h3>
-    <div class="grid grid-cols-4 gap-4">
-      <label class="form-label text-gray-800 dark:text-gray-200">
-        Width (cm)
-        <input
-          name="width"
-          type="number"
-          min="1"
-          step="0.1"
-          class="form-input bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
-          required />
-      </label>
-      <label class="form-label text-gray-800 dark:text-gray-200">
-        Height (cm)
-        <input
-          name="height"
-          type="number"
-          min="1"
-          step="0.1"
-          class="form-input bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
-          required />
-      </label>
-      <label class="form-label text-gray-800 dark:text-gray-200">
-        Depth (cm)
-        <input
-          name="depth"
-          type="number"
-          min="1"
-          step="0.1"
-          class="form-input bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
-          required />
-      </label>
-      <label class="form-label text-gray-800 dark:text-gray-200">
-        Weight (g)
-        <input
-          name="weight"
-          type="number"
-          min="0.1"
-          step="0.1"
-          class="form-input bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
-          required />
-      </label>
-    </div>
+      <div class="mt-6">
+        <button
+          type="submit"
+          disabled={loading}
+          class="w-full rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700">
+          {loading ? "Processing..." : "Get Quote"}
+        </button>
+      </div>
+    </form>
   </div>
-
-  <div class="mt-6">
-    <button
-      type="submit"
-      disabled={loading}
-      class="w-full rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700">
-      {loading ? "Processing..." : "Get Quote"}
-    </button>
-  </div>
-</form>
-</div>
 {/if}
 
 {#if lastQuotation}

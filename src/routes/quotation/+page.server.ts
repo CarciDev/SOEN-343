@@ -9,7 +9,7 @@ import { geocodingService } from "$lib/config/GeocodingConfig";
 const prisma = new PrismaClient();
 
 export const actions = {
-  createQuotation: async ({ request, locals }) => {
+  createQuotation: async ({ request }) => {
     const formData = await request.formData();
 
     try {
@@ -23,10 +23,10 @@ export const actions = {
       weightG = Math.ceil(weightG);
       // Create the box
       const box = await BoxRepository.save({
-          depthCm,
-          widthCm,
-          heightCm,
-          weightG,
+        depthCm,
+        widthCm,
+        heightCm,
+        weightG,
       });
 
       //validate origin address
@@ -66,8 +66,8 @@ export const actions = {
       const destLat = destGeocoding.lat!;
       const destLng = destGeocoding.lng!;
 
-      console.log("Destination geocoding:", destGeocoding); 
-      
+      console.log("Destination geocoding:", destGeocoding);
+
       const origin = await EarthLocationRepository.save({
         address1: formData.get("originAddress1") as string,
         city: formData.get("originCity") as string,
@@ -76,7 +76,7 @@ export const actions = {
         lat: originLat,
         lng: originLng,
       });
-      
+
       const destination = await EarthLocationRepository.save({
         address1: formData.get("destAddress1") as string,
         city: formData.get("destCity") as string,
@@ -105,6 +105,7 @@ export const actions = {
         destinationId: destination.id!,
         amountQuotedCents: shippingCost,
         boxId: box.id!,
+        etaDays: 2,
       });
 
       // Fetch the complete quotation with related data
@@ -121,13 +122,12 @@ export const actions = {
         success: true,
         quotation: completeQuotation,
       };
-    }
-    catch (error) {
+    } catch (error) {
       console.error("Error creating quotation:", error);
       return fail(500, {
         success: false,
         message: "Error creating quotation",
       });
     }
-  }
+  },
 } as Actions;
