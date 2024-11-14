@@ -1,3 +1,4 @@
+// @ts-nocheck
 // @ts-expect-error idk
 let isLoadingLibrary = false;
 
