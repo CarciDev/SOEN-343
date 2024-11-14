@@ -14,9 +14,18 @@ export const geocodingService = {
     address: string,
     city: string,
     country: string,
-    postal: string,
+    postal: string
   ): Promise<GeocodingResponse> => {
-    let fullAddress = `${address} ${city} ${country} ${postal}`;
+    // Replace spaces in each part with "+"
+    const formattedAddress = address.replace(/\s+/g, "+");
+    const formattedCity = city.replace(/\s+/g, "+");
+    const formattedCountry = country.replace(/\s+/g, "+");
+    const formattedPostal = postal.replace(/\s+/g, "+");
+
+    // Construct the full address with "+" as the space separator
+    let fullAddress = `${formattedAddress}+${formattedCity}+${formattedCountry}+${formattedPostal}`;
+
+    // Encode the full address
     fullAddress = encodeURIComponent(fullAddress.trim());
 
     console.log("Geocoding address:", fullAddress);
@@ -29,7 +38,7 @@ export const geocodingService = {
             address: fullAddress,
             key: process.env.GEOCODING_API_KEY,
           },
-        },
+        }
       );
 
       // Check API response status
@@ -64,11 +73,12 @@ export const geocodingService = {
       };
     }
   },
+
   async calculateDistance(
     lat1: number,
     lng1: number,
     lat2: number,
-    lng2: number,
+    lng2: number
   ): Promise<number> {
     try {
       const R = 6371e3; // metres
