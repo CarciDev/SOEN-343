@@ -15,13 +15,24 @@ export const actions = {
 
     try {
       // Retrieve and validate form data
-      const depthCm = Math.ceil(parseFloat(formData.get("depth") as string) || 0);
-      const widthCm = Math.ceil(parseFloat(formData.get("width") as string) || 0);
-      const heightCm = Math.ceil(parseFloat(formData.get("height") as string) || 0);
-      const weightG = Math.ceil(parseFloat(formData.get("weight") as string) || 0);
+      const depthCm = Math.ceil(
+        parseFloat(formData.get("depth") as string) || 0,
+      );
+      const widthCm = Math.ceil(
+        parseFloat(formData.get("width") as string) || 0,
+      );
+      const heightCm = Math.ceil(
+        parseFloat(formData.get("height") as string) || 0,
+      );
+      const weightG = Math.ceil(
+        parseFloat(formData.get("weight") as string) || 0,
+      );
 
       if (!depthCm || !widthCm || !heightCm || !weightG) {
-        return fail(400, { success: false, message: "Invalid package dimensions" });
+        return fail(400, {
+          success: false,
+          message: "Invalid package dimensions",
+        });
       }
 
       // Create the box
@@ -45,10 +56,18 @@ export const actions = {
 
       // Ensure all address fields are provided
       if (!originAddress1 || !originCity || !originCountry || !originPostal) {
-        return fail(400, { success: false, message: "Error: One or many invalid origin address fields (Missing API Details)" });
+        return fail(400, {
+          success: false,
+          message:
+            "Error: One or many invalid origin address fields (Missing API Details)",
+        });
       }
       if (!destAddress1 || !destCity || !destCountry || !destPostal) {
-        return fail(400, { success: false, message: "Error: One or many invalid destination address fields (Missing API Details)" });
+        return fail(400, {
+          success: false,
+          message:
+            "Error: One or many invalid destination address fields (Missing API Details)",
+        });
       }
 
       // Validate origin address using geocoding service
@@ -56,11 +75,14 @@ export const actions = {
         originAddress1,
         originCity,
         originCountry,
-        originPostal
+        originPostal,
       );
 
       if (!originGeocoding.valid) {
-        return fail(400, { success: false, message: "Error: invalid origin address field (Missing API Details)" });
+        return fail(400, {
+          success: false,
+          message: "Error: invalid origin address field (Missing API Details)",
+        });
       }
 
       const originLat = originGeocoding.lat!;
@@ -71,11 +93,15 @@ export const actions = {
         destAddress1,
         destCity,
         destCountry,
-        destPostal
+        destPostal,
       );
 
       if (!destGeocoding.valid) {
-        return fail(400, { success: false, message: "Error: invalid destination address field (Missing API Details)" });
+        return fail(400, {
+          success: false,
+          message:
+            "Error: invalid destination address field (Missing API Details)",
+        });
       }
 
       const destLat = destGeocoding.lat!;
@@ -106,7 +132,7 @@ export const actions = {
         { lat: destLat, lng: destLng },
         { depth: depthCm, width: widthCm, height: heightCm, weight: weightG },
         originCountry,
-        destCountry
+        destCountry,
       );
 
       // Save the quotation
@@ -131,7 +157,10 @@ export const actions = {
       return { success: true, quotation: completeQuotation };
     } catch (error) {
       console.error("Error creating quotation:", error);
-      return fail(500, { success: false, message: "Error creating quotation (MIssing Google Maps API Details)" });
+      return fail(500, {
+        success: false,
+        message: "Error creating quotation (MIssing Google Maps API Details)",
+      });
     }
   },
 } as Actions;
