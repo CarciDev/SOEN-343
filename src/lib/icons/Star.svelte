@@ -12,7 +12,7 @@
 </script>
 
 <svg
-  class="h-6 w-6 text-gray-800 dark:text-white"
+  class="h-[28px] w-[28px] {colorClass}"
   aria-hidden="true"
   xmlns="http://www.w3.org/2000/svg"
   width="24"

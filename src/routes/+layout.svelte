@@ -47,8 +47,6 @@
   import ProfilePopup from "$lib/components/ProfilePopup.svelte";
   import NavBar from "$lib/components/NavBar.svelte";
   import ClipboardListIcon from "$lib/icons/ClipboardListIcon.svelte";
-  import MagnifyingGlass from "$lib/icons/MagnifyingGlass.svelte";
-  import Reserve from "$lib/icons/Reserve.svelte";
   import Dollar from "$lib/icons/Dollar.svelte";
   import Truck from "$lib/icons/Truck.svelte";
   import Message from "$lib/icons/Message.svelte";

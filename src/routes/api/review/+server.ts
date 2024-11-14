@@ -1,8 +1,10 @@
-import { json, type RequestHandler } from "@sveltejs/kit";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
 // Disabling this until needed.
+
+// import { json, type RequestHandler } from "@sveltejs/kit";
+// import { PrismaClient } from "@prisma/client";
+
+// const prisma = new PrismaClient();
+
 // export const POST: RequestHandler = async ({ request, locals }) => {
 //   try {
 //     const formData = await request.formData();
