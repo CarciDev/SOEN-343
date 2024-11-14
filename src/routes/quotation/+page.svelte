@@ -1,8 +1,10 @@
 <script lang="ts">
+  //@ts-nocheck
   import { enhance } from "$app/forms";
   import type { PageData } from "$lib/types";
   import { invalidateAll } from "$app/navigation";
   import { fade } from "svelte/transition";
+  import GooglePlacesAutocomplete from "$lib/components/GooglePlacesAutocomplete/GooglePlacesAutocomplete.svelte";
 
   interface EarthLocation {
     address1: string;
@@ -29,11 +31,11 @@
     lastQuotation: null,
   };
   let showForm = false;
-  let error: { message: string; field?: string } | null = null;
+  let error = null;
   let loading = false;
-  let currentQuotation: Quotation | null = null;
+  let currentQuotation = null;
 
-  function formatAmount(cents: number): string {
+  function formatAmount(cents) {
     return (cents / 100).toLocaleString("en-US", {
       style: "currency",
       currency: "CAD",
@@ -62,6 +64,78 @@
       await update();
     };
   }
+
+  const options = {
+    fields: ["formatted_address", "address_components", "geometry"],
+    types: ["address"],
+  };
+  const placeholder = "Destination city";
+
+  // Variables to store address details
+  let originAddress1 = "";
+  let originCity = "";
+  let originCountryCode = "";
+  let originPostalCode = "";
+
+  let destAddress1 = "";
+  let destCity = "";
+  let destCountryCode = "";
+  let destPostalCode = "";
+
+  // Utility function to extract address components
+  function extractAddressComponent(components, type) {
+    const component = components.find((comp) => comp.types.includes(type));
+    if (!component) return "";
+
+    // Return short_name for 'country', long_name for others
+    return type === "country" ? component.short_name : component.long_name;
+  }
+
+  // Handle place_changed for origin
+  function handlePlaceChanged(event) {
+    const detail = event.detail;
+
+    if (detail?.place) {
+      const components = detail.place.address_components;
+
+      // Extract origin address components
+      originAddress1 =
+        `${extractAddressComponent(components, "street_number")} ${extractAddressComponent(components, "route")}`.trim();
+      originCity = extractAddressComponent(components, "locality");
+      originCountryCode = extractAddressComponent(components, "country");
+      originPostalCode = extractAddressComponent(components, "postal_code");
+
+      console.log("Origin Street Address:", originAddress1);
+      console.log("Origin City:", originCity);
+      console.log("Origin Country Code:", originCountryCode);
+      console.log("Origin Postal Code:", originPostalCode);
+    } else {
+      console.error("Place data is missing in event detail:", detail);
+    }
+  }
+
+  // Handle place_changed for destination
+  function handleDestPlaceChanged(event) {
+    const detail = event.detail;
+
+    if (detail?.place) {
+      const components = detail.place.address_components;
+
+      // Extract destination address components
+      destAddress1 =
+        `${extractAddressComponent(components, "street_number")} ${extractAddressComponent(components, "route")}`.trim();
+      destCity = extractAddressComponent(components, "locality");
+      destCountryCode = extractAddressComponent(components, "country");
+      destPostalCode = extractAddressComponent(components, "postal_code");
+
+      console.log("Destination Street Address:", destAddress1);
+      console.log("Destination City:", destCity);
+      console.log("Destination Country Code:", destCountryCode);
+      console.log("Destination Postal Code:", destPostalCode);
+    } else {
+      console.error("Place data is missing in event detail:", detail);
+    }
+  }
 </script>
 
 <div class="container mx-auto p-4">
@@ -84,7 +158,7 @@
       transition:fade
       class="mb-6 rounded-lg bg-white p-6 shadow-md dark:bg-gray-800">
       <h2 class="mb-4 text-xl font-semibold text-gray-800 dark:text-gray-200">
-        Your Shipping Quote
+        Your Shipping Quotation (ID #:{currentQuotation.id})
       </h2>
       <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
         <!-- Origin Information -->
@@ -170,102 +244,50 @@
 
         <div class="grid grid-cols-2 gap-4">
           <!-- Origin Information -->
-          <div class={error?.field === "origin" ? "border-red-500 p-4" : "p-4"}>
+          <div>
             <h3 class="mb-2 font-bold text-gray-700 dark:text-gray-300">
               Pickup Location
             </h3>
-            <label class="form-label text-gray-800 dark:text-gray-200">
-              Street Address
-              <input
-                name="originAddress1"
-                type="text"
-                placeholder="1234 Main St"
-                class="form-input bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
-                required />
-            </label>
-            <label class="form-label text-gray-800 dark:text-gray-200">
-              City
-              <input
-                name="originCity"
-                type="text"
-                placeholder="San Francisco"
-                class="form-input bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
-                required />
-            </label>
-            <div class="grid grid-cols-2 gap-4">
-              <label class="form-label text-gray-800 dark:text-gray-200">
-                Country
-                <select
-                  name="originCountry"
-                  class="form-select bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
-                  required>
-                  <option value="US">United States</option>
-                  <option value="CA">Canada</option>
-                  <option value="MX">Mexico</option>
-                </select>
-              </label>
-              <label class="form-label text-gray-800 dark:text-gray-200">
-                Postal Code
-                <input
-                  name="originPostal"
-                  type="text"
-                  placeholder="94105"
-                  class="form-input bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
-                  required />
-              </label>
-            </div>
+            <GooglePlacesAutocomplete
+              class="form-input bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
+              on:place_changed={handlePlaceChanged}
+              {options}
+              {placeholder}
+              required />
           </div>
 
           <!-- Destination Information -->
-          <div
-            class={error?.field === "destination"
-              ? "border-red-500 p-4"
-              : "p-4"}>
+          <div>
             <h3 class="mb-2 font-bold text-gray-700 dark:text-gray-300">
               Delivery Location
             </h3>
-            <label class="form-label text-gray-800 dark:text-gray-200">
-              Street Address
-              <input
-                name="destAddress1"
-                type="text"
-                placeholder="5678 Market St"
-                class="form-input bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
-                required />
-            </label>
-            <label class="form-label text-gray-800 dark:text-gray-200">
-              City
-              <input
-                name="destCity"
-                type="text"
-                placeholder="New York"
-                class="form-input bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
-                required />
-            </label>
-            <div class="grid grid-cols-2 gap-4">
-              <label class="form-label text-gray-800 dark:text-gray-200">
-                Country
-                <select
-                  name="destCountry"
-                  class="form-select bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
-                  required>
-                  <option value="US">United States</option>
-                  <option value="CA">Canada</option>
-                  <option value="MX">Mexico</option>
-                </select>
-              </label>
-              <label class="form-label text-gray-800 dark:text-gray-200">
-                Postal Code
-                <input
-                  name="destPostal"
-                  type="text"
-                  placeholder="10001"
-                  class="form-input bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
-                  required />
-              </label>
-            </div>
+            <GooglePlacesAutocomplete
+              class="form-input bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
+              on:place_changed={handleDestPlaceChanged}
+              {options}
+              {placeholder}
+              required />
           </div>
         </div>
+
+        <input
+          type="hidden"
+          name="originAddress1"
+          bind:value={originAddress1} />
+        <input type="hidden" name="originCity" bind:value={originCity} />
+        <input
+          type="hidden"
+          name="originCountry"
+          bind:value={originCountryCode} />
+        <input
+          type="hidden"
+          name="originPostal"
+          bind:value={originPostalCode} />
+
+        <input type="hidden" name="destAddress1" bind:value={destAddress1} />
+        <input type="hidden" name="destCity" bind:value={destCity} />
+        <input type="hidden" name="destCountry" bind:value={destCountryCode} />
+        <input type="hidden" name="destPostal" bind:value={destPostalCode} />
 
         <!-- Package Dimensions -->
         <div class="mt-6">
