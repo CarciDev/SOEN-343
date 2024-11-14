@@ -10,6 +10,7 @@ model User {
   updatedAt    DateTime @updatedAt
 
   shipments ShipmentTransaction[]
+  reviews   Review[]
 }
 
 enum UserRole {
