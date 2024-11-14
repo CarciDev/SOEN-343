@@ -14,10 +14,10 @@ export class BoxRepository {
       ? await prisma.box.upsert({
           where: { id: box.id },
           update: dataFields,
-          create: dataFields,
+          create: { ...dataFields }, // Ensure create has all necessary fields
         })
       : await prisma.box.create({
-          data: dataFields,
+          data: dataFields, // Create a new box without an id
         });
 
     box.id = savedBox.id;
@@ -25,12 +25,5 @@ export class BoxRepository {
     box.updatedAt = savedBox.updatedAt;
     return box;
   }
-
-  static async findById(id: number): Promise<Box | null> {
-    const dbResult = await prisma.box.findFirst({ where: { id: id } });
-    if (dbResult) {
-      return new Box(dbResult);
-    }
-    return null;
-  }
 }
+
