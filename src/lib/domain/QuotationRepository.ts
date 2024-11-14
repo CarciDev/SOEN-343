@@ -13,18 +13,20 @@ export class QuotationRepository {
       destinationId: quotation.destinationId,
       amountQuotedCents: quotation.amountQuotedCents,
       boxId: quotation.boxId,
+      etaDays: quotation.etaDays,
     };
 
     let savedQuote;
 
-    // Use `create` if `quotation.id` is undefined; otherwise, use `upsert`
     if (quotation.id) {
+      // Use `upsert` if `id` is provided (updating or creating)
       savedQuote = await prisma.quotation.upsert({
         where: { id: quotation.id },
         update: dataFields,
         create: dataFields,
       });
     } else {
+      // Create a new record if `id` is not provided
       savedQuote = await prisma.quotation.create({ data: dataFields });
     }
 
