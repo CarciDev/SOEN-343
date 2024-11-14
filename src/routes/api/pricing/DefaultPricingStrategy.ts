@@ -6,8 +6,6 @@ export class DefaultPricingStrategy implements PricingStrategy {
     originCoords: { lat: number; lng: number },
     destCoords: { lat: number; lng: number },
     dimensions: { depth: number; width: number; height: number; weight: number },
-    originCountryCode: string,
-    destinationCountryCode: string
   ): Promise<number> {
     const baseRate = 1000; // $10.00 base rate
     const volumeMultiplier = 0.01;
