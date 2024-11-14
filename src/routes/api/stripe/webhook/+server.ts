@@ -73,9 +73,6 @@ export const POST: RequestHandler = async ({ request }) => {
               shipperId: shipperId,
             });
 
-          // for the time being, please seed some quotation objects for this to work.
-          // just a temporary fix until the quotation objects themselves are passed to checkout,
-          // rather than dummy object parameters.
           await ShipmentTransactionRepository.save(StripeShipmentTransaction);
         }
 
