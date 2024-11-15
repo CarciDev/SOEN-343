@@ -1,38 +1,40 @@
-import { json, type RequestHandler } from "@sveltejs/kit";
-import { PrismaClient } from "@prisma/client";
+// Disabling this until needed.
 
-const prisma = new PrismaClient();
+// import { json, type RequestHandler } from "@sveltejs/kit";
+// import { PrismaClient } from "@prisma/client";
 
-export const POST: RequestHandler = async ({ request, locals }) => {
-  try {
-    const formData = await request.formData();
-    const rating = Number(formData.get("rating"));
-    const deliveryRating = Number(formData.get("deliveryRating"));
-    const wasDeliveryOnTime = formData.get("wasDeliveryOnTime") === "true";
-    const userId = locals.user?.id;
+// const prisma = new PrismaClient();
 
-    if (!userId) {
-      return json({ error: "User not authenticated" }, { status: 401 });
-    }
+// export const POST: RequestHandler = async ({ request, locals }) => {
+//   try {
+//     const formData = await request.formData();
+//     const rating = Number(formData.get("rating"));
+//     const deliveryRating = Number(formData.get("deliveryRating"));
+//     const wasDeliveryOnTime = formData.get("wasDeliveryOnTime") === "true";
+//     const userId = locals.user?.id;
 
-    const user = await prisma.user.findUnique({ where: { id: userId } });
-    if (!user) {
-      return json({ error: "User not found" }, { status: 400 });
-    }
+//     if (!userId) {
+//       return json({ error: "User not authenticated" }, { status: 401 });
+//     }
 
-    const review = await prisma.review.create({
-      data: {
-        rating,
-        deliveryRating,
-        wasDeliveryOnTime,
-        comment: formData.get("comment")?.toString() || "",
-        userId,
-      },
-    });
+//     const user = await prisma.user.findUnique({ where: { id: userId } });
+//     if (!user) {
+//       return json({ error: "User not found" }, { status: 400 });
+//     }
 
-    return json(review);
-  } catch (error) {
-    console.error(error);
-    return json({ error: "Failed to create review" }, { status: 500 });
-  }
-};
+//     const review = await prisma.shipmentTransaction.create({
+//       data: {
+//         rating,
+//         deliveryRating,
+//         wasDeliveryOnTime,
+//         comment: formData.get("comment")?.toString() || "",
+//         userId,
+//       },
+//     });
+
+//     return json(review);
+//   } catch (error) {
+//     console.error(error);
+//     return json({ error: "Failed to create review" }, { status: 500 });
+//   }
+// };
