@@ -70,7 +70,6 @@ export const actions = {
         });
       }
 
-      // Validate origin address using geocoding service
       const originGeocoding = await geocodingService.geocode(
         originAddress1,
         originCity,
@@ -88,7 +87,6 @@ export const actions = {
       const originLat = originGeocoding.lat!;
       const originLng = originGeocoding.lng!;
 
-      // Validate destination address
       const destGeocoding = await geocodingService.geocode(
         destAddress1,
         destCity,
@@ -144,7 +142,7 @@ export const actions = {
         etaDays: 2, // Example ETA
       });
 
-      // Fetch the complete quotation with related data
+      // Query for the complete quotation with related data
       const completeQuotation = await prisma.quotation.findUnique({
         where: { id: quotation.id },
         include: {
