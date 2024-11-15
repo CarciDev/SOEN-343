@@ -139,7 +139,7 @@ When the Prisma schema is in a stable condition (in the desired state), create a
 with:
 
 ```bash
-prisma migrate dev
+npx prisma migrate dev
 ```
 
 This migration file can then be used to update the databases in other

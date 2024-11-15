@@ -5,7 +5,7 @@
   import receiverIconURL from "$lib/icons/map/receiver-marker-icon.png";
   import trackingEventIconURL from "$lib/icons/map/tracking-event-icon.png";
   import { formatDbReservationDate, formatTrackingStatus } from "$lib/utils.js";
-  import { onMount } from "svelte";
+  import GameFacade from "$lib/components/Game/GameFacade.svelte";
 
   export let data;
 
@@ -107,6 +107,7 @@
       {data.origin?.administrativeArea || ""}
       {data.origin?.postalCode || ""}{#if data.origin?.city}<br />{/if}
       {data.origin?.countryCode || ""}
+      <br /><br />
     </div>
     <div class="card p-4">
       <h3 class="text-xl font-bold">Destination</h3>
@@ -119,6 +120,7 @@
       {data.destination?.postalCode ||
         ""}{#if data.destination?.city}<br />{/if}
       {data.destination?.countryCode || ""}
+      <br /><br />
     </div>
     <div class="card p-4">
       <div class="text-xl font-bold">Status</div>
@@ -130,6 +132,10 @@
         Last updated: {formatDbReservationDate(
           data.events[0].createdAt ?? new Date(),
         )}, {data.events[0].createdAt?.toLocaleTimeString()}
+        <br />
+        Shipment paid for: {data.transaction.createdAt
+          ? formatDbReservationDate(data.transaction.createdAt)
+          : ""}
         <br />
         {#if data.eta}
           Promised delivery date: {formatDbReservationDate(data.eta)}
@@ -178,8 +184,6 @@
       </tbody>
     </table>
   </div>
-
-  <!-- Live Map -->
   <h3 class="mb-6 text-xl font-bold">Live Map</h3>
   <div class="grid grid-cols-1 grid-rows-2 gap-4 sm:grid-cols-2 sm:grid-rows-1">
     <div class="card relative flex h-full min-h-[50vh] flex-col p-4">
@@ -238,5 +242,6 @@
         </Map>
       </div>
     </div>
+    <GameFacade />
   </div>
 </div>

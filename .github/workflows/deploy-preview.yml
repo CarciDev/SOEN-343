@@ -18,6 +18,7 @@ jobs:
       VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
       SESSION_SIGNING_KEY: ${{ secrets.SESSION_SIGNING_KEY }}
       EXEC_ENV: ${{ vars.EXEC_ENV }}
+      PUBLIC_GEOCODING_API_KEY: ${{ secrets.PUBLIC_GEOCODING_API_KEY }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -26,6 +27,12 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 18.x
+
+      - name: Remove existing lockfile
+        run: rm package-lock.json
+
+      - name: Install
+        run: npm install
 
       - name: Install dependencies
         run: npm ci

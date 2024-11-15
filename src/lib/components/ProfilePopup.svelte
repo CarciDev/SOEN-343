@@ -25,7 +25,7 @@
         disabled={true}
         ><UserIcon invertColor={true} /><span>Profile</span></button>
       <a
-        href="/dashboard"
+        href="/track"
         style="justify-content: start;"
         class=" bg-secondary-hover-token gap-2"
         ><GridIcon invertColor={true} /><span>Dashboard</span></a>

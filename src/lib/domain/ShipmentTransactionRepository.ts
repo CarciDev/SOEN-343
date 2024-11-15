@@ -3,11 +3,13 @@ import { ShipmentTransaction } from "./ShipmentTransaction";
 
 export class ShipmentTransactionRepository {
   static async save(shipmentTransaction: ShipmentTransaction) {
-    const quotationExists = await prisma.quotation.findUnique({
+    // Fetch the Quotation to ensure it exists and get the originId
+    const quotation = await prisma.quotation.findUnique({
       where: { id: shipmentTransaction.quotationId },
+      select: { originId: true }, // Only select the originId to use as the locationId
     });
 
-    if (!quotationExists) {
+    if (!quotation) {
       throw new Error(
         `Quotation with id ${shipmentTransaction.quotationId} does not exist.`,
       );
@@ -24,7 +26,7 @@ export class ShipmentTransactionRepository {
     const savedTransaction = await prisma.shipmentTransaction.upsert({
       where: {
         trackingNumber: shipmentTransaction.trackingNumber || undefined,
-      }, // originally where: { id: shipmentTransaction.id },
+      },
       update: dataFields,
       create: dataFields,
     });
@@ -32,6 +34,15 @@ export class ShipmentTransactionRepository {
     shipmentTransaction.id = savedTransaction.id;
     shipmentTransaction.createdAt = savedTransaction.createdAt;
     shipmentTransaction.updatedAt = savedTransaction.updatedAt;
+
+    // Create an initial `TrackingEvent` using the Quotation + ShipmentTransaction ID.
+    await prisma.trackingEvent.create({
+      data: {
+        type: "PICKED_UP_AT_ORIGIN",
+        locationId: quotation.originId,
+        shipmentTransactionId: savedTransaction.id,
+      },
+    });
   }
 
   static async findById(id: number): Promise<ShipmentTransaction | null> {
@@ -58,7 +69,7 @@ export class ShipmentTransactionRepository {
   static async findByTrackingNumber(
     trackingNumber: string,
   ): Promise<ShipmentTransaction | null> {
-    // Piggy back of object-build in find by id
+    // Piggyback off object-build in find by id
     const dbResult = await prisma.shipmentTransaction.findUnique({
       select: { id: true },
       where: { trackingNumber: trackingNumber },

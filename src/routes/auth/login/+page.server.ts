@@ -69,6 +69,8 @@ export const actions = {
       }),
       { path: "/" },
     );
+    cookies.set("userId", String(user.id), { path: "/" });
+    //make it easier to access userID without decode
 
     // Prevent open redirect, only allow destinations starting with /
     if ((url.searchParams.get("destination") || "").indexOf("/") == 0) {
