@@ -53,8 +53,8 @@ async function seedAll() {
       administartiveArea: "QC",
       postalCode: "H3G 1M8",
       countryCode: "CA",
-      lat: 45.497276341920866,
-      lng: -73.57893824773116,
+      lat: 45.49727,
+      lng: -73.57893,
     },
   });
 
@@ -68,8 +68,8 @@ async function seedAll() {
       administartiveArea: "QC",
       postalCode: "H4B 1R6",
       countryCode: "CA",
-      lat: 45.45837647581191,
-      lng: -73.63861101850817,
+      lat: 45.45837,
+      lng: -73.63861,
     },
   });
 
