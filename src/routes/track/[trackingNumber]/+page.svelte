@@ -6,6 +6,7 @@
   import trackingEventIconURL from "$lib/icons/map/tracking-event-icon.png";
   import { formatDbReservationDate, formatTrackingStatus } from "$lib/utils.js";
   import GameFacade from "$lib/components/Game/GameFacade.svelte";
+  import { onMount } from "svelte";
 
   export let data;
 
