@@ -43,16 +43,25 @@ export const actions = {
         weightG,
       });
 
-      // Retrieve and validate origin and destination addresses
-      const originAddress1 = formData.get("originAddress1") as string | null;
-      const originCity = formData.get("originCity") as string | null;
-      const originCountry = formData.get("originCountry") as string | null;
-      const originPostal = formData.get("originPostal") as string | null;
+      // 6107 Retrieve and validate origin and destination addresses
+      const originAddress1 = formData.get("originAddress1") as string | "";
+      const originCity = formData.get("originCity") as string | "";
+      const originCountry = formData.get("originCountry") as string | "";
+      const originPostal = formData.get("originPostal") as string | "";
 
-      const destAddress1 = formData.get("destAddress1") as string | null;
-      const destCity = formData.get("destCity") as string | null;
-      const destCountry = formData.get("destCountry") as string | null;
-      const destPostal = formData.get("destPostal") as string | null;
+      const destAddress1 = formData.get("destAddress1") as string | "";
+      const destCity = formData.get("destCity") as string | "";
+      const destCountry = formData.get("destCountry") as string | "";
+      const destPostal = formData.get("destPostal") as string | "";
+
+      console.log("originAddress1 " + originAddress1);
+      console.log("originCity " + originCity);
+      console.log("originCountry " + originCountry);
+      console.log("originPostal " + originPostal);
+      console.log("destAddress1 " + destAddress1);
+      console.log("destCity " + destCity);
+      console.log("destCountry " + destCountry);
+      console.log("destPostal " + destPostal);
 
       // Ensure all address fields are provided
       if (!originAddress1 || !originCity || !originCountry || !originPostal) {
@@ -74,15 +83,7 @@ export const actions = {
         originAddress1,
         originCity,
         originCountry,
-        originPostal,
       );
-
-      if (!originGeocoding.valid) {
-        return fail(400, {
-          success: false,
-          message: "Error: invalid origin address field (Missing API Details)",
-        });
-      }
 
       const originLat = originGeocoding.lat!;
       const originLng = originGeocoding.lng!;
@@ -91,16 +92,7 @@ export const actions = {
         destAddress1,
         destCity,
         destCountry,
-        destPostal,
       );
-
-      if (!destGeocoding.valid) {
-        return fail(400, {
-          success: false,
-          message:
-            "Error: invalid destination address field (Missing API Details)",
-        });
-      }
 
       const destLat = destGeocoding.lat!;
       const destLng = destGeocoding.lng!;
@@ -157,7 +149,7 @@ export const actions = {
       console.error("Error creating quotation:", error);
       return fail(500, {
         success: false,
-        message: "Error creating quotation (MIssing Google Maps API Details)",
+        message: "Error creating quotation (Missing Google Maps API Details)",
       });
     }
   },

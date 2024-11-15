@@ -14,56 +14,34 @@ export const geocodingService = {
     address: string,
     city: string,
     country: string,
-    postal: string,
   ): Promise<GeocodingResponse> => {
     // Replace spaces in each part with "+"
     const formattedAddress = address.replace(/\s+/g, "+");
     const formattedCity = city.replace(/\s+/g, "+");
     const formattedCountry = country.replace(/\s+/g, "+");
-    const formattedPostal = postal.replace(/\s+/g, "+");
 
     // Construct the full address with "+" as the space separator
-    let fullAddress = `${formattedAddress}+${formattedCity}+${formattedCountry}+${formattedPostal}`;
-
-    // Encode the full address
-    fullAddress = encodeURIComponent(fullAddress.trim());
-
-    console.log("Geocoding address:", fullAddress);
+    const fullAddress = `${formattedAddress}+${formattedCity}+${formattedCountry}`;
 
     try {
       const response = await axios.get(
-        "https://maps.googleapis.com/maps/api/geocode/json",
-        {
-          params: {
-            address: fullAddress,
-            key: process.env.GEOCODING_API_KEY,
-          },
-        },
+        `https://geocode.maps.co/search?q=${fullAddress}&api_key=6736cc8dc9ada175503049tcqd3c1fd`,
       );
 
+      const res = response.data[0];
+
       // Check API response status
-      if (response.data.status !== "OK") {
+      if (!res) {
         return {
           valid: false,
           error: `Geocoding API Error: ${response.data.status}`,
         };
       }
 
-      const results = response.data.results;
-
-      if (results?.length > 0 && results[0].geometry?.location) {
-        const location = results[0].geometry.location;
-        return {
-          valid: true,
-          lat: location.lat,
-          lng: location.lng,
-          formattedAddress: results[0].formatted_address,
-        };
-      }
-
       return {
-        valid: false,
-        error: "No results found for the provided address",
+        valid: true,
+        lat: Number(res.lat),
+        lng: Number(res.lon),
       };
     } catch (error) {
       console.error("Geocoding error:", error);
