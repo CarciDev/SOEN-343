@@ -105,8 +105,12 @@
     <button
       class="rounded bg-green-500 px-4 py-2 text-white hover:bg-green-600"
       on:click={() => {
-        window.location.href =
-          "/make-payment" + `?quotationId=${retrievedQuotation.id}`;
+        if (retrievedQuotation?.shipmentTransaction) {
+          errorMessage = "This quotation has already been paid.";
+        } else {
+          window.location.href =
+            "/make-payment" + `?quotationId=${retrievedQuotation.id}`;
+        }
       }}>
       Proceed to Payment
     </button>
