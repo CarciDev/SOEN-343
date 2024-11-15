@@ -1,28 +1,13 @@
 <script lang="ts">
-  import { enhance } from "$app/forms";
   import type { PageData } from "./$types";
-  import { invalidateAll } from "$app/navigation";
-  import { fade } from "svelte/transition";
 
   export let data: PageData;
-  let showForm = false;
-  let error: { message: string; field?: string } | null = null;
   let loading = false;
-  let lastQuotation: {
-    id: number;
-    origin: { city: string; countryCode: number };
-    destination: { city: string; countryCode: number };
-    box: {
-      widthCm: number;
-      depthCm: number;
-      heightCm: number;
-      weightG: number;
-    };
-    amountQuotedCents: number;
-  };
   let quotationId = "";
   let retrievedQuotation = data.retrievedQuotation;
   let errorMessage = data.errorMessage;
+  //@ts-expect-error Property 'lastQuotation' does not exist on type
+  let lastQuotation = data.lastQuotation; // Assuming this comes from `PageData`
 
   function formatAmount(cents: number): string {
     return (cents / 100).toLocaleString("en-US", {
@@ -31,48 +16,9 @@
     });
   }
 
-  async function handleSubmit() {
-    loading = true;
-    error = null;
-
-    return async ({
-      result,
-      update,
-    }: {
-      result: {
-        type: string;
-        data?: {
-          message?: string;
-          field?: string;
-          quotation?: typeof retrievedQuotation;
-        };
-      };
-      update: () => Promise<void>;
-    }): Promise<void> => {
-      loading = false;
-
-      if (result.type === "failure") {
-        error = {
-          message: result.data?.message || "An error occurred",
-          field: result.data?.field,
-        };
-      } else if (result.type === "success") {
-        error = null;
-        showForm = false;
-        retrievedQuotation = result.data.quotation;
-        await invalidateAll();
-      }
-      await update();
-    };
-  }
-
   async function redirectToQuotation() {
-    console.log("Redirecting to Quotation");
     if (parseInt(quotationId) < 0 || !Number.isInteger(parseInt(quotationId))) {
-      error = {
-        message: "Quotation ID must be a positive number",
-        field: "retrieve",
-      };
+      errorMessage = "Quotation ID must be a positive number";
       return;
     } else {
       window.location.href = "/rates-calculator?quotationId=" + quotationId;
@@ -91,22 +37,21 @@
       Quotation ID
       <input
         type="number"
-        required={true}
+        required
         min="0"
         bind:value={quotationId}
         placeholder="Enter Quotation ID"
-        class="w-full appearance-none rounded border px-3 py-2 leading-tight text-gray-700 shadow dark:bg-gray-700 dark:text-gray-200" />
+        class="w-full rounded border px-3 py-2 text-gray-700 shadow dark:bg-gray-700 dark:text-gray-200" />
     </label>
     <button
-      class="rounded bg-green-500 px-4 py-2 text-white transition-colors hover:bg-green-600"
+      class="rounded bg-green-500 px-4 py-2 text-white hover:bg-green-600"
       on:click={redirectToQuotation}
       disabled={loading}>
       {loading ? "Retrieving..." : "Retrieve Quotation"}
     </button>
     {#if errorMessage}
       <div
-        class="mt-4 rounded bg-red-100 p-4 text-red-700 dark:bg-red-200 dark:text-red-800"
-        transition:fade>
+        class="mt-4 rounded bg-red-100 p-4 text-red-700 dark:bg-red-200 dark:text-red-800">
         {errorMessage}
       </div>
     {/if}
@@ -122,248 +67,49 @@
       class="mt-4 w-full border-collapse border border-gray-300 dark:border-gray-700">
       <thead>
         <tr>
-          <th class="border border-gray-300 p-2 dark:border-gray-700">ID</th>
-          <th class="border border-gray-300 p-2 dark:border-gray-700"
-            >Origin</th>
-          <th class="border border-gray-300 p-2 dark:border-gray-700"
-            >Destination</th>
-          <th class="border border-gray-300 p-2 dark:border-gray-700"
-            >Dimensions</th>
-          <th class="border border-gray-300 p-2 dark:border-gray-700"
-            >Weight</th>
-          <th class="border border-gray-300 p-2 dark:border-gray-700">Cost</th>
+          <th class="border p-2">ID</th>
+          <th class="border p-2">Origin</th>
+          <th class="border p-2">Destination</th>
+          <th class="border p-2">Dimensions</th>
+          <th class="border p-2">Weight</th>
+          <th class="border p-2">Cost</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td class="border border-gray-300 p-2 dark:border-gray-700">
-            {retrievedQuotation.id}
-          </td>
-          <td class="border border-gray-300 p-2 dark:border-gray-700">
-            {retrievedQuotation.origin.address1}
-            <br />
-            {retrievedQuotation.origin.postalCode}
-            <br />
+          <td class="border p-2">{retrievedQuotation.id}</td>
+          <td class="border p-2">
+            {retrievedQuotation.origin.address1}<br />
+            {retrievedQuotation.origin.postalCode}<br />
             {retrievedQuotation.origin.city}, {retrievedQuotation.origin
               .countryCode}
           </td>
-          <td class="border border-gray-300 p-2 dark:border-gray-700">
-            {retrievedQuotation.destination.address1}
-            <br />
-            {retrievedQuotation.destination.postalCode}
-            <br />
+          <td class="border p-2">
+            {retrievedQuotation.destination.address1}<br />
+            {retrievedQuotation.destination.postalCode}<br />
             {retrievedQuotation.destination.city}, {retrievedQuotation
               .destination.countryCode}
           </td>
-          <td class="border border-gray-300 p-2 dark:border-gray-700">
+          <td class="border p-2">
             {retrievedQuotation.box.widthCm} x {retrievedQuotation.box.depthCm} x
             {retrievedQuotation.box.heightCm} cm
           </td>
-          <td class="border border-gray-300 p-2 dark:border-gray-700">
-            {retrievedQuotation.box.weightG} g
-          </td>
-          <td class="border border-gray-300 p-2 dark:border-gray-700">
-            {formatAmount(retrievedQuotation.amountQuotedCents)}
-          </td>
+          <td class="border p-2">{retrievedQuotation.box.weightG} g</td>
+          <td class="border p-2"
+            >{formatAmount(retrievedQuotation.amountQuotedCents)}</td>
         </tr>
       </tbody>
     </table>
   </div>
-
-  <!-- Button to proceed to payment -->
   <div class="mt-6 text-right">
     <button
-      class="rounded bg-green-500 px-4 py-2 text-white transition-colors hover:bg-green-600"
+      class="rounded bg-green-500 px-4 py-2 text-white hover:bg-green-600"
       on:click={() => {
         window.location.href =
-          "/make-payment" + `?quotationId=${retrievedQuotation?.id}`;
+          "/make-payment" + `?quotationId=${retrievedQuotation.id}`;
       }}>
       Proceed to Payment
     </button>
-  </div>
-{/if}
-
-{#if !retrievedQuotation}
-  <div class="mt-6 flex justify-center">
-    <button
-      class="rounded bg-blue-500 px-4 py-2 text-white transition-colors hover:bg-blue-600"
-      on:click={() => {
-        showForm = !showForm;
-        console.log("showForm:", showForm); // Add this line to debug
-      }}>
-      {showForm ? "Hide Form" : "Show Form"}
-    </button>
-  </div>
-{/if}
-
-{#if showForm}
-  <div
-    transition:fade
-    class="mt-4 rounded bg-white p-6 shadow-md dark:bg-gray-800">
-    <form method="POST" action="?/createQuotation" use:enhance={handleSubmit}>
-      {#if error}
-        <div
-          class="alert-error alert mt-2 text-red-600 dark:text-red-400"
-          transition:fade>
-          {error.message}
-        </div>
-      {/if}
-
-      <div class="grid grid-cols-2 gap-4">
-        <!-- Origin Information -->
-        <div class={error?.field === "origin" ? "border-red-500 p-4" : "p-4"}>
-          <h3 class="mb-2 font-bold text-gray-700 dark:text-gray-300">
-            Pickup Location
-          </h3>
-          <label class="form-label text-gray-800 dark:text-gray-200">
-            Street Address
-            <input
-              name="originAddress1"
-              type="text"
-              placeholder="1234 Main St"
-              class="form-input bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
-              required />
-          </label>
-          <label class="form-label text-gray-800 dark:text-gray-200">
-            City
-            <input
-              name="originCity"
-              type="text"
-              placeholder="San Francisco"
-              class="form-input bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
-              required />
-          </label>
-          <div class="grid grid-cols-2 gap-4">
-            <label class="form-label text-gray-800 dark:text-gray-200">
-              Country
-              <select
-                name="originCountry"
-                class="form-select bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
-                required>
-                <option value="US">United States</option>
-                <option value="CA">Canada</option>
-                <option value="MX">Mexico</option>
-              </select>
-            </label>
-            <label class="form-label text-gray-800 dark:text-gray-200">
-              Postal Code
-              <input
-                name="originPostal"
-                type="text"
-                placeholder="94105"
-                class="form-input bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
-                required />
-            </label>
-          </div>
-        </div>
-
-        <!-- Destination Information -->
-        <div
-          class={error?.field === "destination" ? "border-red-500 p-4" : "p-4"}>
-          <h3 class="mb-2 font-bold text-gray-700 dark:text-gray-300">
-            Delivery Location
-          </h3>
-          <label class="form-label text-gray-800 dark:text-gray-200">
-            Street Address
-            <input
-              name="destAddress1"
-              type="text"
-              placeholder="5678 Market St"
-              class="form-input bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
-              required />
-          </label>
-          <label class="form-label text-gray-800 dark:text-gray-200">
-            City
-            <input
-              name="destCity"
-              type="text"
-              placeholder="New York"
-              class="form-input bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
-              required />
-          </label>
-          <div class="grid grid-cols-2 gap-4">
-            <label class="form-label text-gray-800 dark:text-gray-200">
-              Country
-              <select
-                name="destCountry"
-                class="form-select bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
-                required>
-                <option value="US">United States</option>
-                <option value="CA">Canada</option>
-                <option value="MX">Mexico</option>
-              </select>
-            </label>
-            <label class="form-label text-gray-800 dark:text-gray-200">
-              Postal Code
-              <input
-                name="destPostal"
-                type="text"
-                placeholder="10001"
-                class="form-input bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
-                required />
-            </label>
-          </div>
-        </div>
-      </div>
-
-      <!-- Package Dimensions -->
-      <div class="mt-6">
-        <h3 class="mb-2 font-bold text-gray-700 dark:text-gray-300">
-          Package Dimensions
-        </h3>
-        <div class="grid grid-cols-4 gap-4">
-          <label class="form-label text-gray-800 dark:text-gray-200">
-            Width (cm)
-            <input
-              name="width"
-              type="number"
-              min="1"
-              step="0.1"
-              class="form-input bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
-              required />
-          </label>
-          <label class="form-label text-gray-800 dark:text-gray-200">
-            Height (cm)
-            <input
-              name="height"
-              type="number"
-              min="1"
-              step="0.1"
-              class="form-input bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
-              required />
-          </label>
-          <label class="form-label text-gray-800 dark:text-gray-200">
-            Depth (cm)
-            <input
-              name="depth"
-              type="number"
-              min="1"
-              step="0.1"
-              class="form-input bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
-              required />
-          </label>
-          <label class="form-label text-gray-800 dark:text-gray-200">
-            Weight (g)
-            <input
-              name="weight"
-              type="number"
-              min="0.1"
-              step="0.1"
-              class="form-input bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200"
-              required />
-          </label>
-        </div>
-      </div>
-
-      <div class="mt-6">
-        <button
-          type="submit"
-          disabled={loading}
-          class="w-full rounded-md bg-blue-500 px-4 py-2 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700">
-          {loading ? "Processing..." : "Get Quote"}
-        </button>
-      </div>
-    </form>
   </div>
 {/if}
 
@@ -376,40 +122,29 @@
       class="mt-4 w-full border-collapse border border-gray-300 dark:border-gray-700">
       <thead>
         <tr>
-          <th class="border border-gray-300 p-2 dark:border-gray-700">ID</th>
-          <th class="border border-gray-300 p-2 dark:border-gray-700"
-            >Origin</th>
-          <th class="border border-gray-300 p-2 dark:border-gray-700"
-            >Destination</th>
-          <th class="border border-gray-300 p-2 dark:border-gray-700"
-            >Dimensions</th>
-          <th class="border border-gray-300 p-2 dark:border-gray-700"
-            >Weight</th>
-          <th class="border border-gray-300 p-2 dark:border-gray-700">Cost</th>
+          <th class="border p-2">ID</th>
+          <th class="border p-2">Origin</th>
+          <th class="border p-2">Destination</th>
+          <th class="border p-2">Dimensions</th>
+          <th class="border p-2">Weight</th>
+          <th class="border p-2">Cost</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td class="border border-gray-300 p-2 dark:border-gray-700">
-            {lastQuotation.id}
-          </td>
-          <td class="border border-gray-300 p-2 dark:border-gray-700">
-            {lastQuotation.origin.city}, {lastQuotation.origin.countryCode}
-          </td>
-          <td class="border border-gray-300 p-2 dark:border-gray-700">
-            {lastQuotation.destination.city}, {lastQuotation.destination
-              .countryCode}
-          </td>
-          <td class="border border-gray-300 p-2 dark:border-gray-700">
-            {lastQuotation.box.widthCm} x {lastQuotation.box.depthCm} x
-            {lastQuotation.box.heightCm} cm
-          </td>
-          <td class="border border-gray-300 p-2 dark:border-gray-700">
-            {lastQuotation.box.weightG} g
-          </td>
-          <td class="border border-gray-300 p-2 dark:border-gray-700">
-            {formatAmount(lastQuotation.amountQuotedCents)}
-          </td>
+          <td class="border p-2">{lastQuotation.id}</td>
+          <td class="border p-2"
+            >{lastQuotation.origin.city}, {lastQuotation.origin
+              .countryCode}</td>
+          <td class="border p-2"
+            >{lastQuotation.destination.city}, {lastQuotation.destination
+              .countryCode}</td>
+          <td class="border p-2"
+            >{lastQuotation.box.widthCm} x {lastQuotation.box.depthCm} x {lastQuotation
+              .box.heightCm} cm</td>
+          <td class="border p-2">{lastQuotation.box.weightG} g</td>
+          <td class="border p-2"
+            >{formatAmount(lastQuotation.amountQuotedCents)}</td>
         </tr>
       </tbody>
     </table>

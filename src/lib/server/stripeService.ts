@@ -51,7 +51,7 @@ export async function createQuotationCheckoutSession(
         quotation_id: checkoutData.checkout_metadata.quotation_id,
       },
 
-      success_url: `${process.env.PUBLIC_BASE_URL}/dashboard`,
+      success_url: `${process.env.PUBLIC_BASE_URL}/track`,
       cancel_url: `${process.env.PUBLIC_BASE_URL}/`,
     });
 
