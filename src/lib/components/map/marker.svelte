@@ -6,6 +6,7 @@
   export let lon: number;
   export let label: string;
   export let customIconURL: string;
+  export let iconSize: [number, number] = [50, 80]; // Default icon size
 
   // get methods from context
   const { getLeaflet, getMap } = getContext<MapContext>(key);
@@ -14,13 +15,13 @@
   const leaflet = getLeaflet();
   const map = getMap();
 
-  var customMarkerIcon = leaflet.icon({
+  // create custom marker icon with dynamic size
+  const customMarkerIcon = leaflet.icon({
     iconUrl: customIconURL,
-
-    iconSize: [50, 80], // size of the icon
+    iconSize: iconSize, // use the passed icon size
     shadowSize: [50, 64], // size of the shadow
-    iconAnchor: [22, 94], // point of the icon which will correspond to marker's location
-    popupAnchor: [-3, -76], // point from which the popup should open relative to the iconAnchor
+    iconAnchor: [iconSize[0] / 2, iconSize[1]], // adjust anchor based on icon size
+    popupAnchor: [-3, -iconSize[1] / 2], // adjust popup anchor based on icon size
   });
 
   // add marker

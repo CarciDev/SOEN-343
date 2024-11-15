@@ -3,12 +3,11 @@
   import Marker from "$lib/components/map/marker.svelte";
   import senderIconURL from "$lib/icons/map/sender-marker-icon.png";
   import receiverIconURL from "$lib/icons/map/receiver-marker-icon.png";
+  import trackingEventIconURL from "$lib/icons/map/tracking-event-icon.png";
   import { formatDbReservationDate, formatTrackingStatus } from "$lib/utils.js";
-  import { onMount, onDestroy } from "svelte";
+  import { onMount } from "svelte";
 
   export let data;
-
-  console.log(data);
 
   const lat1: number = Number(data.origin?.lat) || 0;
   const lon1: number = Number(data.origin?.lng) || 0;
@@ -25,7 +24,15 @@
     zoomLevel = calculateZoomLevel(distance);
   });
 
-  // calculate the distance between two lat/lon points
+  // Enum for tracking status
+  enum TrackingStatus {
+    PICKED_UP_AT_ORIGIN = "PICKED_UP_AT_ORIGIN",
+    FACILITY_TRANSIT = "FACILITY_TRANSIT",
+    OUT_FOR_DELIVERY = "OUT_FOR_DELIVERY",
+    DELIVERED = "DELIVERED",
+  }
+
+  // Helper functions for distance and zoom level calculations
   function getDistance(lat1: number, lon1: number, lat2: number, lon2: number) {
     const R = 6371; // Radius of the Earth in km
     const dLat = (lat2 - lat1) * (Math.PI / 180);
@@ -40,7 +47,6 @@
     return R * c; // Distance in km
   }
 
-  // calculate zoom level based on distance
   function calculateZoomLevel(distance: number) {
     if (distance < 1) return 15;
     if (distance < 5) return 14;
@@ -51,7 +57,36 @@
     if (distance < 200) return 9;
     if (distance < 500) return 8;
     if (distance < 1000) return 7;
-    return 6;
+    return 4;
+  }
+
+  // Get the latest event
+  const latestEvent = data.events.length > 0 ? data.events[0] : null;
+  let eventLat = lat1; // Default to sender's location
+  let eventLon = lon1;
+
+  // Set the event marker location based on the latest tracking event
+  if (latestEvent) {
+    switch (latestEvent.type) {
+      case TrackingStatus.PICKED_UP_AT_ORIGIN:
+        eventLat = lat1;
+        eventLon = lon1;
+        break;
+      case TrackingStatus.FACILITY_TRANSIT:
+        // Intermediate point between sender and receiver
+        eventLat = (lat1 + lat2) / 2;
+        eventLon = (lon1 + lon2) / 2;
+        break;
+      case TrackingStatus.OUT_FOR_DELIVERY:
+        // Closer to the receiver's location
+        eventLat = lat2 - (lat2 - lat1) * 0.1;
+        eventLon = lon2 - (lon2 - lon1) * 0.1;
+        break;
+      case TrackingStatus.DELIVERED:
+        eventLat = lat2;
+        eventLon = lon2;
+        break;
+    }
   }
 </script>
 
@@ -62,6 +97,7 @@
     Item {data.transaction.trackingNumber}
   </h2>
 
+  <!-- Information about origin, destination, and status -->
   <div class="mb-6 columns-3">
     <div class="card p-4">
       <h3 class="text-xl font-bold">Origin</h3>
@@ -104,6 +140,7 @@
     </div>
   </div>
 
+  <!-- Tracking history and live map -->
   <h3 class="mb-6 text-xl font-bold">Tracking History</h3>
   <div class="table-container mb-6">
     <table class="table table-hover">
@@ -141,33 +178,63 @@
       </tbody>
     </table>
   </div>
+
+  <!-- Live Map -->
   <h3 class="mb-6 text-xl font-bold">Live Map</h3>
   <div class="grid grid-cols-1 grid-rows-2 gap-4 sm:grid-cols-2 sm:grid-rows-1">
     <div class="card relative flex h-full min-h-[50vh] flex-col p-4">
       <div class="flex-1 rounded-xl">
-        <Map lat={avgLat} lon={avgLon} zoom={zoomLevel}>
+        <Map
+          mapLat={avgLat}
+          mapLon={avgLon}
+          senderLat={lat1}
+          senderLon={lon1}
+          receiverLat={lat2}
+          receiverLon={lon2}
+          zoom={zoomLevel}>
+          <!-- Sender Marker -->
           <Marker
             lat={lat1}
             lon={lon1}
             label={String(data.origin?.address1)}
             customIconURL={senderIconURL}
+            iconSize={[50, 80]}
             on:open={() => {
-              console.log("Marker label opened!");
+              console.log("Sender marker opened!");
             }}
             on:close={() => {
-              console.log("Marker label closed");
+              console.log("Sender marker closed");
             }} />
+
+          <!-- Receiver Marker -->
           <Marker
             lat={lat2}
             lon={lon2}
             label={String(data.destination?.address1)}
             customIconURL={receiverIconURL}
+            iconSize={[50, 80]}
             on:open={() => {
-              console.log("Marker label opened!");
+              console.log("Receiver marker opened!");
             }}
             on:close={() => {
-              console.log("Marker label closed");
+              console.log("Receiver marker closed");
             }} />
+
+          <!-- Latest Tracking Event Marker -->
+          {#if latestEvent}
+            <Marker
+              lat={eventLat}
+              lon={eventLon}
+              label={formatTrackingStatus(latestEvent.type)}
+              customIconURL={trackingEventIconURL}
+              iconSize={[80, 70]}
+              on:open={() => {
+                console.log("Tracking event marker opened!");
+              }}
+              on:close={() => {
+                console.log("Tracking event marker closed");
+              }} />
+          {/if}
         </Map>
       </div>
     </div>

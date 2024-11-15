@@ -1,13 +1,16 @@
 <script lang="ts">
   import { onMount, setContext } from "svelte";
-
   import type L from "leaflet";
   import { key } from "$lib/components/map";
 
   import "leaflet/dist/leaflet.css";
 
-  export let lat: number;
-  export let lon: number;
+  export let mapLat: number;
+  export let mapLon: number;
+  export let senderLat: number;
+  export let senderLon: number;
+  export let receiverLat: number;
+  export let receiverLon: number;
   export let zoom: number;
 
   let leaflet: typeof L;
@@ -22,16 +25,11 @@
   onMount(async () => {
     leaflet = await import("leaflet");
 
-    // Define bounds (example bounds around the world)
-    const southWest = leaflet.latLng(-90, -180);
-    const northEast = leaflet.latLng(90, 180);
-    const bounds = leaflet.latLngBounds(southWest, northEast);
-
     leafletMap = leaflet
       .map(mapEl, {
         zoomControl: true,
       })
-      .setView([lat, lon], zoom);
+      .setView([mapLat, mapLon], zoom);
 
     leaflet
       .tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -44,17 +42,81 @@
 
     leafletMap.attributionControl.setPrefix(false);
 
-    // You can draw shapes on the map
-    // leaflet.circle([lat, lon], { radius: 200000 }).addTo(leafletMap);
+    // Function to calculate the number of intermediary points based on distance
+    function calculateNumberOfPoints(
+      startLat: number,
+      startLon: number,
+      endLat: number,
+      endLon: number,
+    ): number {
+      const R = 6371; // Radius of the Earth in kilometers
+      const dLat = ((endLat - startLat) * Math.PI) / 180;
+      const dLon = ((endLon - startLon) * Math.PI) / 180;
+      const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos((startLat * Math.PI) / 180) *
+          Math.cos((endLat * Math.PI) / 180) *
+          Math.sin(dLon / 2) *
+          Math.sin(dLon / 2);
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+      const distance = R * c; // Distance in kilometers
 
+      // Adjust the number of points based on the distance
+      if (distance < 50) return 5; // Short distance
+      if (distance < 200) return 20; // Medium distance
+      if (distance < 1000) return 50; // Long distance
+      return 100; // Very long distance
+    }
+
+    // Function to generate random intermediary points
+    function generateIntermediaryPoints(
+      startLat: number,
+      startLon: number,
+      endLat: number,
+      endLon: number,
+      numberOfPoints: number,
+    ): [number, number][] {
+      const points: [number, number][] = [];
+      const latDiff = endLat - startLat;
+      const lonDiff = endLon - startLon;
+
+      for (let i = 1; i <= numberOfPoints; i++) {
+        const factor = i / (numberOfPoints + 1);
+        const randomLat =
+          startLat + latDiff * factor + (Math.random() - 0.5) * 0.1; // Small random adjustment
+        const randomLon =
+          startLon + lonDiff * factor + (Math.random() - 0.5) * 0.1; // Small random adjustment
+        points.push([randomLat, randomLon]);
+      }
+      return points;
+    }
+
+    // Calculate the number of points based on distance
+    const numberOfPoints = calculateNumberOfPoints(
+      senderLat,
+      senderLon,
+      receiverLat,
+      receiverLon,
+    );
+
+    // Generate intermediary points
+    const intermediaryPoints = generateIntermediaryPoints(
+      senderLat,
+      senderLon,
+      receiverLat,
+      receiverLon,
+      numberOfPoints,
+    );
+
+    // Combine all points to form a polyline
     const route = leaflet.polyline(
       [
-        [57.74, 11.94], // Starting point
-        [57.76, 11.95], // Intermediate point
-        [57.78, 11.96], // Ending point
+        [senderLat, senderLon],
+        ...intermediaryPoints,
+        [receiverLat, receiverLon],
       ],
       {
-        color: "blue", // Color of the line
+        color: "orange", // Color of the line
         weight: 4, // Line thickness
         opacity: 0.7, // Line opacity
       },
