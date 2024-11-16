@@ -46,6 +46,11 @@
   import HomeIcon from "$lib/icons/HomeIcon.svelte";
   import ProfilePopup from "$lib/components/ProfilePopup.svelte";
   import NavBar from "$lib/components/NavBar.svelte";
+  import ClipboardListIcon from "$lib/icons/ClipboardListIcon.svelte";
+  import Dollar from "$lib/icons/Dollar.svelte";
+  import Truck from "$lib/icons/Truck.svelte";
+  import Message from "$lib/icons/Message.svelte";
+  import Star from "$lib/icons/Star.svelte";
 
   storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
 
@@ -77,6 +82,31 @@
 
   const links: Link[] = [
     { name: "Home", href: "/", icon: HomeIcon as SvelteComponent },
+    {
+      name: "Track",
+      href: "/track",
+      icon: ClipboardListIcon as SvelteComponent,
+    },
+    {
+      name: "Get a Quote",
+      href: "/quotation",
+      icon: Dollar as SvelteComponent,
+    },
+    {
+      name: "Start an Order ",
+      href: "/rates-calculator",
+      icon: Truck as SvelteComponent,
+    },
+    {
+      name: "Support",
+      href: "/chatbot",
+      icon: Message as SvelteComponent,
+    },
+    {
+      name: "Leave a Review",
+      href: "/review",
+      icon: Star as SvelteComponent,
+    },
   ];
 </script>
 

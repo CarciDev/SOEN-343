@@ -53,8 +53,8 @@ async function seedAll() {
       administartiveArea: "QC",
       postalCode: "H3G 1M8",
       countryCode: "CA",
-      lat: 45.497276341920866,
-      lng: -73.57893824773116,
+      lat: 45.49727,
+      lng: -73.57893,
     },
   });
 
@@ -68,8 +68,8 @@ async function seedAll() {
       administartiveArea: "QC",
       postalCode: "H4B 1R6",
       countryCode: "CA",
-      lat: 45.45837647581191,
-      lng: -73.63861101850817,
+      lat: 45.45837,
+      lng: -73.63861,
     },
   });
 
@@ -78,6 +78,31 @@ async function seedAll() {
     update: {},
     create: {
       id: 1,
+      originId: concordia.id,
+      destinationId: loyola.id,
+      amountQuotedCents: 2000,
+      boxId: box.id,
+    },
+  });
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const quote2 = await prisma.quotation.upsert({
+    where: { id: 2 },
+    update: {},
+    create: {
+      id: 2,
+      originId: concordia.id,
+      destinationId: loyola.id,
+      amountQuotedCents: 2000,
+      boxId: box.id,
+    },
+  });
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const quote3 = await prisma.quotation.upsert({
+    where: { id: 3 },
+    update: {},
+    create: {
+      id: 3,
       originId: concordia.id,
       destinationId: loyola.id,
       amountQuotedCents: 2000,

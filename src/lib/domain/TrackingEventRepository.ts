@@ -1,5 +1,6 @@
 import { prisma } from "$lib/db/client";
 import { TrackingEvent } from "./TrackingEvent";
+import type { TrackingStatus } from "./TrackingStatus";
 
 export class TrackingEventRepository {
   static async save(trackingEvent: TrackingEvent) {
@@ -45,5 +46,20 @@ export class TrackingEventRepository {
       return trackingEvents;
     }
     return null;
+  }
+
+  static formatTrackingStatus(ts: TrackingStatus | string): string {
+    switch (ts) {
+      case "PICKED_UP_AT_ORIGIN":
+        return "Picked up at origin";
+      case "FACILITY_TRANSIT":
+        return "Transit through facility";
+      case "OUT_FOR_DELIVERY":
+        return "On delivery vehicle";
+      case "DELIVERED":
+        return "Delivered";
+      default:
+        return "Other status";
+    }
   }
 }

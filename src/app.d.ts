@@ -4,6 +4,7 @@ import type { UserRole } from "@prisma/client";
 
 // for information about these interfaces
 declare global {
+  /// <reference types="stripe-event-types" />
   namespace App {
     // interface Error {}
     interface Locals {

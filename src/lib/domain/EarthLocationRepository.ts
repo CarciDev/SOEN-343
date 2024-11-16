@@ -14,15 +14,26 @@ export class EarthLocationRepository {
       lng: earthLocation.lng,
     };
 
-    const savedLocation = await prisma.earthLocation.upsert({
-      where: { id: earthLocation.id },
-      update: dataFields,
-      create: dataFields,
-    });
+    let savedLocation;
+
+    if (earthLocation.id) {
+      savedLocation = await prisma.earthLocation.upsert({
+        where: { id: earthLocation.id },
+        update: dataFields,
+        create: dataFields,
+      });
+    } else {
+      // If `id` is not provided, create a new record
+      savedLocation = await prisma.earthLocation.create({
+        data: dataFields,
+      });
+    }
 
     earthLocation.id = savedLocation.id;
     earthLocation.createdAt = savedLocation.createdAt;
     earthLocation.updatedAt = savedLocation.updatedAt;
+
+    return earthLocation;
   }
 
   static async findById(id: number): Promise<EarthLocation | null> {

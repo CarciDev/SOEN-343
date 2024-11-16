@@ -10,22 +10,19 @@ export class BoxRepository {
       weightG: box.weightG,
     };
 
-    const savedBox = await prisma.box.upsert({
-      where: { id: box.id },
-      update: dataFields,
-      create: dataFields,
-    });
+    const savedBox = box.id
+      ? await prisma.box.upsert({
+          where: { id: box.id },
+          update: dataFields,
+          create: { ...dataFields }, // Ensure create has all necessary fields
+        })
+      : await prisma.box.create({
+          data: dataFields, // Create a new box without an id
+        });
 
     box.id = savedBox.id;
     box.createdAt = savedBox.createdAt;
     box.updatedAt = savedBox.updatedAt;
-  }
-
-  static async findById(id: number): Promise<Box | null> {
-    const dbResult = await prisma.box.findFirst({ where: { id: id } });
-    if (dbResult) {
-      return new Box(dbResult);
-    }
-    return null;
+    return box;
   }
 }
