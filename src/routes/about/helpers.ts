@@ -32,20 +32,20 @@ export const attributionsData: Attribution[] = [
       "https://docs.github.com/en/github/site-policy/github-terms-of-service",
   },
   {
-    name: "Google Maps Autocomplete API",
+    name: "Google Places Autocomplete API",
     resourceUrl:
       "https://developers.google.com/maps/documentation/javascript/places-autocomplete",
     description: "API for suggesting place predictions as the user types.",
     license: "Google APIs Terms of Service",
-    licenseUrl: "https://cloud.google.com/maps-platform/terms",
+    licenseUrl: "https://developers.google.com/maps/documentation/javascript/place-autocomplete",
   },
   {
-    name: "Google Maps Geocoding API",
+    name: "Geocode.Maps API",
     resourceUrl:
-      "https://developers.google.com/maps/documentation/geocoding/overview",
-    description: "API for converting addresses into geographic coordinates.",
-    license: "Google APIs Terms of Service",
-    licenseUrl: "https://cloud.google.com/maps-platform/terms",
+      "https://geocode.maps.co/",
+    description: "Geocoding API for converting addresses into geographic coordinates.",
+    license: "GNU GPL v3.0 License",
+    licenseUrl: "https://github.com/provokateurin/osm-nominatim/blob/master/LICENSE",
   },
   {
     name: "Husky.sh",
