@@ -37,15 +37,17 @@ export const attributionsData: Attribution[] = [
       "https://developers.google.com/maps/documentation/javascript/places-autocomplete",
     description: "API for suggesting place predictions as the user types.",
     license: "Google APIs Terms of Service",
-    licenseUrl: "https://developers.google.com/maps/documentation/javascript/place-autocomplete",
+    licenseUrl:
+      "https://developers.google.com/maps/documentation/javascript/place-autocomplete",
   },
   {
     name: "Geocode.Maps API",
-    resourceUrl:
-      "https://geocode.maps.co/",
-    description: "Geocoding API for converting addresses into geographic coordinates.",
+    resourceUrl: "https://geocode.maps.co/",
+    description:
+      "Geocoding API for converting addresses into geographic coordinates.",
     license: "GNU GPL v3.0 License",
-    licenseUrl: "https://github.com/provokateurin/osm-nominatim/blob/master/LICENSE",
+    licenseUrl:
+      "https://github.com/provokateurin/osm-nominatim/blob/master/LICENSE",
   },
   {
     name: "Husky.sh",
