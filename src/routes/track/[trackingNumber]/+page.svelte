@@ -7,6 +7,7 @@
   import { formatDbReservationDate, formatTrackingStatus } from "$lib/utils.js";
   import GameFacade from "$lib/components/Game/GameFacade.svelte";
   import { onMount } from "svelte";
+  import { UserRole } from "@prisma/client";
 
   export let data;
 
@@ -245,4 +246,13 @@
     </div>
     <GameFacade />
   </div>
+
+  {#if data.user?.role == UserRole.ADMIN}
+    <div class="m-4 text-center">
+      <a
+        class="underline"
+        href="/admin/update-tracking?trackingNumber={data.transaction
+          .trackingNumber}">Update tracking</a>
+    </div>
+  {/if}
 </div>
