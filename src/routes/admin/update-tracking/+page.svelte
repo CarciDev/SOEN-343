@@ -56,12 +56,21 @@
       <form method="POST" class="flex flex-col gap-3">
         <label class="label">
           <span>Tracking number</span>
-          <input class="input" type="text" placeholder="111111111111" value="{initialTrackingNumber}"/>
+          <input
+            class="input"
+            type="text"
+            placeholder="111111111111"
+            name="trackingNumber"
+            value={initialTrackingNumber} />
         </label>
 
         <label class="label">
           <span>Status</span>
-          <select name="status" class="select" bind:value={selectedStatus} on:change={updateLocationInputFromStatus}>
+          <select
+            name="status"
+            class="select"
+            bind:value={selectedStatus}
+            on:change={updateLocationInputFromStatus}>
             <option value="PICKED_UP_AT_ORIGIN">Picked up at origin</option>
             <option value="FACILITY_TRANSIT">Transit through facility</option>
             <option value="OUT_FOR_DELIVERY">Out for delivery</option>
@@ -74,7 +83,9 @@
           <select
             name="locationInputType"
             id="locationInputType"
-            class="select" bind:value={selectedLocationInputType} on:change={enableDisableLocationInput}>
+            class="select"
+            bind:value={selectedLocationInputType}
+            on:change={enableDisableLocationInput}>
             <option value="origin">Use shipment origin location</option>
             <option value="destination"
               >Use shipment destination location</option>
@@ -95,8 +106,13 @@
                 name="coords"
                 placeholder="45.49727, -73.57893"
                 bind:value={coordsValue} />
-              <button type="button" class="variant-filled-secondary" on:click={() => navigator.geolocation.getCurrentPosition(updateFromGeolocation)}
-                >Locate Me</button>
+              <button
+                type="button"
+                class="variant-filled-secondary"
+                on:click={() =>
+                  navigator.geolocation.getCurrentPosition(
+                    updateFromGeolocation,
+                  )}>Locate Me</button>
             </div>
           </label>
         </div>
