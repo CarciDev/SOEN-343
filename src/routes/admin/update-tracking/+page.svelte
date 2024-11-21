@@ -1,9 +1,49 @@
-<script>
+<script lang="ts">
   import LocationPinIcon from "$lib/icons/LocationPinIcon.svelte";
   import { page } from "$app/stores";
 
   const initialTrackingNumber = $page.url.searchParams.get("trackingNumber");
 
+  let selectedStatus = "PICKED_UP_AT_ORIGIN";
+  let selectedLocationInputType = "origin";
+
+  function updateLocationInputFromStatus() {
+    switch (selectedStatus) {
+      case "PICKED_UP_AT_ORIGIN":
+        selectedLocationInputType = "origin";
+        break;
+      case "FACILITY_TRANSIT":
+      case "OUT_FOR_DELIVERY":
+        selectedLocationInputType = "input";
+        break;
+      case "DELIVERED":
+        selectedLocationInputType = "destination";
+        break;
+    }
+    enableDisableLocationInput();
+  }
+
+  let locationInputsDiv: HTMLElement;
+
+  function enableDisableLocationInput() {
+    switch (selectedLocationInputType) {
+      case "origin":
+      case "destination":
+        // Disable the form
+        locationInputsDiv.classList.add("hidden");
+        break;
+      case "input":
+        // Enable the form
+        locationInputsDiv.classList.remove("hidden");
+        break;
+    }
+  }
+
+  let coordsValue = "";
+
+  async function updateFromGeolocation(position: GeolocationPosition) {
+    coordsValue = `${position.coords.latitude}, ${position.coords.longitude}`;
+  }
 </script>
 
 <div class="flex flex-col items-center justify-center gap-4">
@@ -21,7 +61,7 @@
 
         <label class="label">
           <span>Status</span>
-          <select name="status" class="select">
+          <select name="status" class="select" bind:value={selectedStatus} on:change={updateLocationInputFromStatus}>
             <option value="PICKED_UP_AT_ORIGIN">Picked up at origin</option>
             <option value="FACILITY_TRANSIT">Transit through facility</option>
             <option value="OUT_FOR_DELIVERY">Out for delivery</option>
@@ -34,7 +74,7 @@
           <select
             name="locationInputType"
             id="locationInputType"
-            class="select">
+            class="select" bind:value={selectedLocationInputType} on:change={enableDisableLocationInput}>
             <option value="origin">Use shipment origin location</option>
             <option value="destination"
               >Use shipment destination location</option>
@@ -42,7 +82,7 @@
           </select>
         </label>
 
-        <div id="locationInputs" class="opacity-50">
+        <div id="locationInputs" bind:this={locationInputsDiv} class="hidden">
           <label class="label">
             <span>Coordinates</span>
             <div
@@ -52,27 +92,12 @@
               </div>
               <input
                 type="text"
-                name="coordinates"
+                name="coords"
                 placeholder="45.49727, -73.57893"
-                disabled />
-              <button class="variant-filled-secondary" disabled
+                bind:value={coordsValue} />
+              <button type="button" class="variant-filled-secondary" on:click={() => navigator.geolocation.getCurrentPosition(updateFromGeolocation)}
                 >Locate Me</button>
             </div>
-          </label>
-
-          <label class="label">
-            <span>City</span>
-            <input type="text" class="input" name="city" />
-          </label>
-
-          <label class="label">
-            <span>Administrative area</span>
-            <input type="text" class="input" name="administrativeArea" />
-          </label>
-
-          <label class="label">
-            <span>Country code</span>
-            <input type="text" class="input" name="country" />
           </label>
         </div>
 
