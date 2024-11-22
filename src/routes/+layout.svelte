@@ -102,11 +102,6 @@
       icon: Truck as SvelteComponent,
     },
     {
-      name: "Support",
-      href: "/chatbot",
-      icon: Message as SvelteComponent,
-    },
-    {
       name: "Leave a Review",
       href: "/review",
       icon: Star as SvelteComponent,
