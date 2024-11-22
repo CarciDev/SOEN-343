@@ -14,6 +14,7 @@
   import type { HomePageCardType } from "$lib/components/HomePage3D/HomePageCard.svelte";
   import HomePageCard from "$lib/components/HomePage3D/HomePageCard.svelte";
   import Truck from "$lib/components/HomePage3D/Truck/Truck.svelte";
+  import pin from "../../static/HomePage/pin.png";
 
   function inSphere(array: Float32Array, radius: number) {
     const numPoints = array.length / 3;
@@ -73,7 +74,6 @@
 
   let sphere: TypedArray;
   let mouseMove = false;
-  let isMobile = false;
 
   $: sectionVisibility = 0;
 
@@ -115,8 +115,6 @@
     animate();
 
     window.addEventListener("mousemove", handleMouseMove);
-
-    isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
     return () => {
       window.removeEventListener("mousemove", handleMouseMove);
@@ -208,9 +206,8 @@
     },
   ];
 
-  
   onMount(() => {
-    const customCursor = document.getElementById('custom-cursor');
+    const customCursor = document.getElementById("custom-cursor");
     let lastX = 0;
 
     if (!customCursor) {
@@ -220,7 +217,7 @@
 
     console.log("Custom cursor initialized and ready!");
 
-    document.addEventListener('mousemove', (event) => {
+    document.addEventListener("mousemove", (event) => {
       console.log(`Mouse moved to: X=${event.pageX}, Y=${event.pageY}`);
 
       customCursor.style.left = `${event.pageX}px`;
@@ -244,7 +241,7 @@
   });
 </script>
 
-<div id="custom-cursor"></div>
+<div id="custom-cursor" style="background-image: url('{pin}')"></div>
 
 <div
   style="z-index: 0;"
@@ -365,7 +362,7 @@
     position: absolute;
     width: 45px;
     height: 45px;
-    background: url('pin.png') no-repeat center center;
+    background: no-repeat center center;
     background-size: contain;
     pointer-events: none;
     z-index: 10000;
