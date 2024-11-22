@@ -207,7 +207,44 @@
       previewImage: "/order.png",
     },
   ];
+
+  
+  onMount(() => {
+    const customCursor = document.getElementById('custom-cursor');
+    let lastX = 0;
+
+    if (!customCursor) {
+      console.error("Custom cursor element not found!");
+      return;
+    }
+
+    console.log("Custom cursor initialized and ready!");
+
+    document.addEventListener('mousemove', (event) => {
+      console.log(`Mouse moved to: X=${event.pageX}, Y=${event.pageY}`);
+
+      customCursor.style.left = `${event.pageX}px`;
+      customCursor.style.top = `${event.pageY}px`;
+      console.log("Cursor position updated:", {
+        left: customCursor.style.left,
+        top: customCursor.style.top,
+      });
+
+      const deltaX = event.pageX - lastX;
+      console.log("Mouse deltaX (horizontal movement):", deltaX);
+
+      const rotation = Math.min(Math.max(deltaX, -50), 50);
+      customCursor.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
+      console.log("Cursor rotation applied (degrees):", rotation / 10);
+
+      lastX = event.pageX;
+    });
+
+    console.log("Mousemove event listener attached.");
+  });
 </script>
+
+<div id="custom-cursor"></div>
 
 <div
   style="z-index: 0;"
@@ -322,5 +359,17 @@
 
   .bottom-button {
     bottom: 20px;
+  }
+
+  #custom-cursor {
+    position: absolute;
+    width: 45px;
+    height: 45px;
+    background: url('pin.png') no-repeat center center;
+    background-size: contain;
+    pointer-events: none;
+    z-index: 10000;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease-out;
   }
 </style>
