@@ -9,6 +9,5 @@
       Need assistance? SvelteShipSolutions is proud to offer the latest and
       greatest in AI-driven customer support, direclty at your fingertips.
     </p>
-    <ChatBox />
   </div>
 </main>
