@@ -57,20 +57,20 @@ export const initializeScene = async (divId: string) => {
 
     const cursorPosition = new THREE.Vector3();
     const orbitCenter = new THREE.Vector3();
-    const orbitRadius = 2;
+    const orbitRadius = 5;
     const orbitSpeed = 0.01;
     let orbitAngle = 0;
 
-    const spinDistance = 0.5;
+    const spinDistance = 0.2;
     const maxSpinSpeed = 0.02;
-    const spinTransitionSpeed = 0.05;
+    const spinTransitionSpeed = 1;
     let currentSpinSpeed = 0;
     let spinAngle = 0;
 
     const onMouseMove = (event: MouseEvent) => {
       const mouseX = (event.clientX / window.innerWidth) * 2 - 1;
       const mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
-      cursorPosition.set(mouseX * 10, mouseY * 3.5, -5);
+      cursorPosition.set(mouseX * 10, mouseY * 4, -5);
     };
     window.addEventListener("mousemove", onMouseMove);
 

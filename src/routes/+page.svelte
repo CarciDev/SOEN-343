@@ -207,26 +207,35 @@
   ];
 
   onMount(() => {
-    const customCursor = document.getElementById("custom-cursor");
-    let lastX = 0;
+  const customCursor = document.getElementById("custom-cursor");
+  let lastX = 0;
+  let rotation = 0;
+  let velocity = 0;
 
-    if (!customCursor) {
-      console.error("Custom cursor element not found!");
-      return;
-    }
+  if (!customCursor) {
+    console.error("Custom cursor element not found!");
+    return;
+  }
 
-    document.addEventListener("mousemove", (event) => {
-      customCursor.style.left = `${event.pageX}px`;
-      customCursor.style.top = `${event.pageY}px`;
+  document.addEventListener("mousemove", (event) => {
+    customCursor.style.left = `${event.pageX}px`;
+    customCursor.style.top = `${event.pageY}px`;
 
-      const deltaX = event.pageX - lastX;
+    const deltaX = event.pageX - lastX;
 
-      const rotation = Math.min(Math.max(deltaX, -50), 50);
-      customCursor.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
+    const targetRotation = Math.min(Math.max(deltaX * 1.8, -40), 40);
 
-      lastX = event.pageX;
-    });
+    velocity += (targetRotation - rotation) * 2;
+    velocity *= 0.85;
+    rotation += velocity;
+
+    customCursor.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
+
+    lastX = event.pageX;
   });
+});
+
+
 </script>
 
 <div style="cursor: none;">
@@ -266,16 +275,15 @@
       </T.Group>
     </Canvas>
   </div>
+  <div class="fixed top-0 left-0">
+    <Truck />
+  </div>
 
   <div
     style="z-index: 3;"
     class="section-card relative h-screen"
     id="section0"
     data-section="0">
-    <div class="absolute mx-[-15rem]">
-      <Truck />
-    </div>
-
     <div
       class="relative flex h-5/6 flex-col items-center justify-center space-y-6">
       <div
