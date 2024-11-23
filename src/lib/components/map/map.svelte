@@ -2,25 +2,91 @@
   import { onMount, setContext } from "svelte";
   import type L from "leaflet";
   import { key } from "$lib/components/map";
+  import { modeCurrent } from "@skeletonlabs/skeleton";
 
   import "leaflet/dist/leaflet.css";
 
   export let mapLat: number;
   export let mapLon: number;
-  export let senderLat: number;
-  export let senderLon: number;
-  export let receiverLat: number;
-  export let receiverLon: number;
   export let zoom: number;
 
   let leaflet: typeof L;
   let leafletMap: L.Map;
   let mapEl: HTMLDivElement;
+  let baseLayer: L.TileLayer;
 
   setContext(key, {
     getLeaflet: () => leaflet,
     getMap: () => leafletMap,
   });
+
+  const baseLayers = {
+    light: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    dark: "https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}.png",
+  };
+
+  const baseLayerAttribution = {
+    light:
+      '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    dark: '&copy; <a href="https://stadiamaps.com/">Stadia Maps</a>, &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a>, &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  };
+
+  $: if (leafletMap && baseLayer) {
+    // Update the base layer reactively based on current Skeleton theme value
+    const currentTheme = $modeCurrent === false ? "dark" : "light";
+    const url = baseLayers[currentTheme];
+    const attribution = baseLayerAttribution[currentTheme];
+
+    const newLayer = leaflet.tileLayer(url, {
+      minZoom: 2,
+      maxZoom: 20,
+      attribution,
+    });
+
+    leafletMap.addLayer(newLayer);
+    leafletMap.removeLayer(baseLayer);
+    baseLayer = newLayer;
+
+    // Reapply zoom control styles when the theme changes (otherwise they won't be applied)
+    styleZoomControls();
+  }
+
+  function styleZoomControls() {
+    setTimeout(() => {
+      const zoomControls = document.querySelectorAll(".leaflet-control-zoom");
+
+      zoomControls.forEach((control) => {
+        if (control instanceof HTMLElement) {
+          // Apply the theme-specific styles
+          const isDarkMode = $modeCurrent === false;
+          control.style.backgroundColor = isDarkMode
+            ? "rgba(50, 50, 50, 0.8)"
+            : "rgba(255, 255, 255, 0.8)";
+          control.style.borderRadius = "5px";
+          control.style.padding = "5px";
+
+          const buttons = control.querySelectorAll(
+            ".leaflet-control-zoom-in, .leaflet-control-zoom-out",
+          );
+          buttons.forEach((button) => {
+            if (button instanceof HTMLElement) {
+              button.style.backgroundColor = isDarkMode ? "#333" : "#fff";
+              button.style.color = isDarkMode ? "#fff" : "#333";
+              button.style.border = isDarkMode
+                ? "1px solid #666"
+                : "1px solid #ccc";
+              button.style.borderRadius = "3px";
+              button.style.width = "30px";
+              button.style.height = "30px";
+              button.style.lineHeight = "30px";
+              button.style.textAlign = "center";
+              button.style.cursor = "pointer";
+            }
+          });
+        }
+      });
+    }, 0);
+  }
 
   onMount(async () => {
     leaflet = await import("leaflet");
@@ -31,99 +97,17 @@
       })
       .setView([mapLat, mapLon], zoom);
 
-    leaflet
-      .tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        minZoom: 0,
-        maxZoom: 20,
-        attribution:
-          '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-      })
-      .addTo(leafletMap);
+    const initialTheme = $modeCurrent === false ? "dark" : "light";
+    baseLayer = leaflet.tileLayer(baseLayers[initialTheme], {
+      minZoom: 2,
+      maxZoom: 20,
+      attribution: baseLayerAttribution[initialTheme],
+    });
 
+    baseLayer.addTo(leafletMap);
     leafletMap.attributionControl.setPrefix(false);
 
-    // Function to calculate the number of intermediary points based on distance
-    function calculateNumberOfPoints(
-      startLat: number,
-      startLon: number,
-      endLat: number,
-      endLon: number,
-    ): number {
-      const R = 6371; // Radius of the Earth in kilometers
-      const dLat = ((endLat - startLat) * Math.PI) / 180;
-      const dLon = ((endLon - startLon) * Math.PI) / 180;
-      const a =
-        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos((startLat * Math.PI) / 180) *
-          Math.cos((endLat * Math.PI) / 180) *
-          Math.sin(dLon / 2) *
-          Math.sin(dLon / 2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      const distance = R * c; // Distance in kilometers
-
-      // Adjust the number of points based on the distance
-      if (distance < 50) return 5; // Short distance
-      if (distance < 200) return 20; // Medium distance
-      if (distance < 1000) return 50; // Long distance
-      return 100; // Very long distance
-    }
-
-    // Function to generate random intermediary points
-    function generateIntermediaryPoints(
-      startLat: number,
-      startLon: number,
-      endLat: number,
-      endLon: number,
-      numberOfPoints: number,
-    ): [number, number][] {
-      const points: [number, number][] = [];
-      const latDiff = endLat - startLat;
-      const lonDiff = endLon - startLon;
-
-      for (let i = 1; i <= numberOfPoints; i++) {
-        const factor = i / (numberOfPoints + 1);
-        const randomLat =
-          startLat + latDiff * factor + (Math.random() - 0.5) * 0.1; // Small random adjustment
-        const randomLon =
-          startLon + lonDiff * factor + (Math.random() - 0.5) * 0.1; // Small random adjustment
-        points.push([randomLat, randomLon]);
-      }
-      return points;
-    }
-
-    // Calculate the number of points based on distance
-    const numberOfPoints = calculateNumberOfPoints(
-      senderLat,
-      senderLon,
-      receiverLat,
-      receiverLon,
-    );
-
-    // Generate intermediary points
-    const intermediaryPoints = generateIntermediaryPoints(
-      senderLat,
-      senderLon,
-      receiverLat,
-      receiverLon,
-      numberOfPoints,
-    );
-
-    // Combine all points to form a polyline
-    const route = leaflet.polyline(
-      [
-        [senderLat, senderLon],
-        ...intermediaryPoints,
-        [receiverLat, receiverLon],
-      ],
-      {
-        color: "orange", // Color of the line
-        weight: 4, // Line thickness
-        opacity: 0.7, // Line opacity
-      },
-    );
-
-    // Add the polyline to the map
-    route.addTo(leafletMap);
+    styleZoomControls(); // Style the zoom controls after mounting
   });
 </script>
 
@@ -136,8 +120,11 @@
 <style scoped>
   .map {
     position: absolute;
-    inset: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     z-index: 1;
-    border-radius: 0.75rem;
+    border-radius: inherit;
   }
 </style>

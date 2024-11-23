@@ -62,20 +62,22 @@ file in the project's root.
 
 The following variables can be configured:
 
-| VAR                   | DESC                                                 | DEFAULT                                                                                 |
-| --------------------- | ---------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| PUBLIC_BASE_URL       | The base URL of the project                          | `http:/localhost:5173`                                                                  |
-| DB_HOST               | The dev database host                                | `localhost`                                                                             |
-| DB_USER               | The dev database username                            | `devuser`                                                                               |
-| DB_PASSWORD           | The dev database password                            | `supersecret`                                                                           |
-| DB_NAME               | The dev database name                                | `devdb`                                                                                 |
-| DB_PORT               | The dev database port                                | `5433`                                                                                  |
-| DATABASE_URL          | The database URL (used by Prisma)                    | `postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?schema=public` |
-| DIRECT_DATABASE_URL   | Used in development environment to keep Prisma happy | `postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?schema=public` |
-| EXEC_ENV              | Current execution environment                        | `development`                                                                           |
-| SESSION_SIGNING_KEY   | 32 random bytes in hex format, used to sign sessions | `6bd8a14a0d6333b239ae45260618f09cae07c45bef34d4b1c21e7d64d13254b0`                      |
-| STRIPE_SECRET_KEY     | Prefixed by sk_test\_, used to call the Stripe API   | `{YOUR_STRIPE_SECRET_KEY}`                                                              |
-| STRIPE_SIGNING_SECRET | Prefixed by whsec\_, used to verify event signatures | `{YOUR_STRIPE_WEBHOOK_SIGNING_SECRET}`                                                  |
+| VAR                      | DESC                                                 | DEFAULT                                                                                 |
+| ------------------------ | ---------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| PUBLIC_BASE_URL          | The base URL of the project                          | `http:/localhost:5173`                                                                  |
+| DB_HOST                  | The dev database host                                | `localhost`                                                                             |
+| DB_USER                  | The dev database username                            | `devuser`                                                                               |
+| DB_PASSWORD              | The dev database password                            | `supersecret`                                                                           |
+| DB_NAME                  | The dev database name                                | `devdb`                                                                                 |
+| DB_PORT                  | The dev database port                                | `5433`                                                                                  |
+| DATABASE_URL             | The database URL (used by Prisma)                    | `postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?schema=public` |
+| DIRECT_DATABASE_URL      | Used in development environment to keep Prisma happy | `postgresql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}:${DB_PORT}/${DB_NAME}?schema=public` |
+| EXEC_ENV                 | Current execution environment                        | `development`                                                                           |
+| SESSION_SIGNING_KEY      | 32 random bytes in hex format, used to sign sessions | `6bd8a14a0d6333b239ae45260618f09cae07c45bef34d4b1c21e7d64d13254b0`                      |
+| STRIPE_SECRET_KEY        | Prefixed by sk_test\_, used to call the Stripe API   | `{YOUR_STRIPE_SECRET_KEY}`                                                              |
+| STRIPE_SIGNING_SECRET    | Prefixed by whsec\_, used to verify event signatures | `{YOUR_STRIPE_WEBHOOK_SIGNING_SECRET}`                                                  |
+| GEOCODING_API_KEY        | Used to integrate Google Maps API                    | `{GOOGLE_MAPS_API_KEY}`                                                                 |
+| PUBLIC_GEOCODING_API_KEY | Used to integrate Google Maps API on the client-side | `{GOOGLE_MAPS_API_KEY}`                                                                 |
 
 ### Starting the Dev Environment
 
