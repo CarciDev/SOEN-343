@@ -20,7 +20,7 @@ export class TrackingEventRepository {
       });
     } else {
       savedTrackingEvent = await prisma.trackingEvent.create({
-        data: dataFields
+        data: dataFields,
       });
     }
 
