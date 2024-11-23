@@ -5,8 +5,9 @@
 
   // Function to check if the user is logged in
   async function checkLogin() {
-    const sessionToken = document.cookie.split('; ').find(row => row.startsWith('session='));
-    if (!sessionToken) {
+    const response = await fetch('/api/check-session');
+    const data = await response.json();
+    if (!data.loggedIn) {
       await goto('/auth/login');
       return false;
     }
