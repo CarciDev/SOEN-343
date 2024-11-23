@@ -100,7 +100,7 @@
   </h2>
 
   <!-- Information about origin, destination, and status -->
-  <div class="mb-6 columns-3">
+  <div class="mb-6 grid grid-cols-3 gap-4">
     <div class="card p-4">
       <h3 class="text-xl font-bold">Origin</h3>
       {data.origin?.address1 || ""}{#if data.origin?.address1}<br />{/if}
@@ -109,7 +109,6 @@
       {data.origin?.administrativeArea || ""}
       {data.origin?.postalCode || ""}{#if data.origin?.city}<br />{/if}
       {data.origin?.countryCode || ""}
-      <br /><br />
     </div>
     <div class="card p-4">
       <h3 class="text-xl font-bold">Destination</h3>
@@ -122,7 +121,6 @@
       {data.destination?.postalCode ||
         ""}{#if data.destination?.city}<br />{/if}
       {data.destination?.countryCode || ""}
-      <br /><br />
     </div>
     <div class="card p-4">
       <div class="text-xl font-bold">Status</div>
