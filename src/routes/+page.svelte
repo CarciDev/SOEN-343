@@ -14,7 +14,7 @@
   import type { HomePageCardType } from "$lib/components/HomePage3D/HomePageCard.svelte";
   import HomePageCard from "$lib/components/HomePage3D/HomePageCard.svelte";
   import Truck from "$lib/components/HomePage3D/Truck/Truck.svelte";
-  import pin from "../../static/HomePage/pin.png";
+  import pin from "$lib/components/HomePage3D/pin.png";
 
   function inSphere(array: Float32Array, radius: number) {
     const numPoints = array.length / 3;
@@ -215,116 +215,106 @@
       return;
     }
 
-    console.log("Custom cursor initialized and ready!");
-
     document.addEventListener("mousemove", (event) => {
-      console.log(`Mouse moved to: X=${event.pageX}, Y=${event.pageY}`);
-
       customCursor.style.left = `${event.pageX}px`;
       customCursor.style.top = `${event.pageY}px`;
-      console.log("Cursor position updated:", {
-        left: customCursor.style.left,
-        top: customCursor.style.top,
-      });
 
       const deltaX = event.pageX - lastX;
-      console.log("Mouse deltaX (horizontal movement):", deltaX);
 
       const rotation = Math.min(Math.max(deltaX, -50), 50);
       customCursor.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
-      console.log("Cursor rotation applied (degrees):", rotation / 10);
 
       lastX = event.pageX;
     });
-
-    console.log("Mousemove event listener attached.");
   });
 </script>
 
-<div id="custom-cursor" style="background-image: url('{pin}')"></div>
+<div style="cursor: none;">
+  <div id="custom-cursor" style="background-image: url('{pin}')"></div>
 
-<div
-  style="z-index: 0;"
-  class="{currentMode ? 'sceneLight' : 'sceneDark'} absolute">
-  <Canvas>
-    <T.PerspectiveCamera position={[0, 0.6, 0]} fov={50} makeDefault>
-    </T.PerspectiveCamera>
+  <div
+    style="z-index: 0;"
+    class="{currentMode ? 'sceneLight' : 'sceneDark'} absolute">
+    <Canvas>
+      <T.PerspectiveCamera position={[0, 0.6, 0]} fov={50} makeDefault>
+      </T.PerspectiveCamera>
 
-    <T.AmbientLight color="#ffffff" intensity={0.2} />
+      <T.AmbientLight color="#ffffff" intensity={0.2} />
 
-    <T.DirectionalLight
-      color="#ffffff"
-      intensity={2}
-      position={[10, 10, 0]}
-      shadow.camera.top={8}
-      castShadow />
+      <T.DirectionalLight
+        color="#ffffff"
+        intensity={2}
+        position={[10, 10, 0]}
+        shadow.camera.top={8}
+        castShadow />
 
-    <T.Group rotation={$cameraPosition}>
-      <T.Points>
-        <T.BufferGeometry>
-          <T.BufferAttribute
-            args={[sphere, 3]}
-            attach={(parent, self) => {
-              parent.setAttribute("position", self);
-              return () => {};
-            }} />
-        </T.BufferGeometry>
-        <T.PointsMaterial
-          color={currentMode ? "black" : "white"}
-          size={currentMode ? 0.004 : 0.002}
-          sizeAttenuation={true} />
-      </T.Points>
-    </T.Group>
-  </Canvas>
-</div>
-
-<div
-  style="z-index: 3;"
-  class="section-card relative h-screen"
-  id="section0"
-  data-section="0">
-  <div class="absolute mx-[-15rem]">
-    <Truck />
+      <T.Group rotation={$cameraPosition}>
+        <T.Points>
+          <T.BufferGeometry>
+            <T.BufferAttribute
+              args={[sphere, 3]}
+              attach={(parent, self) => {
+                parent.setAttribute("position", self);
+                return () => {};
+              }} />
+          </T.BufferGeometry>
+          <T.PointsMaterial
+            color={currentMode ? "black" : "white"}
+            size={currentMode ? 0.004 : 0.002}
+            sizeAttenuation={true} />
+        </T.Points>
+      </T.Group>
+    </Canvas>
   </div>
 
   <div
-    class="relative flex h-5/6 flex-col items-center justify-center space-y-6">
-    <div
-      transition:fade={{ delay: 250, duration: 300 }}
-      class="text-center text-7xl font-extrabold">
-      Welcome to SvelteShip Solutions
+    style="z-index: 3;"
+    class="section-card relative h-screen"
+    id="section0"
+    data-section="0">
+    <div class="absolute mx-[-15rem]">
+      <Truck />
     </div>
 
+    <div
+      class="relative flex h-5/6 flex-col items-center justify-center space-y-6">
+      <div
+        transition:fade={{ delay: 250, duration: 300 }}
+        class="text-center text-7xl font-extrabold">
+        Welcome to SvelteShip Solutions
+      </div>
+
+      <button
+        on:click={scrollToSection}
+        transition:fade={{ delay: 250, duration: 300 }}
+        class="variant-filled-primary btn mx-auto block"
+        style="z-index: 3;">
+        Begin
+      </button>
+    </div>
+
+    <div style="z-index: 3;" class="relative mt-10">
+      {#each homePageCards as card}
+        <HomePageCard {card} {currentMode} />
+      {/each}
+    </div>
+  </div>
+
+  <div style="z-index: 3;" class="absolute-center bottom-button bottom-0">
     <button
-      on:click={scrollToSection}
-      transition:fade={{ delay: 250, duration: 300 }}
-      class="variant-filled-primary btn mx-auto block"
-      style="z-index: 3;">
-      Begin
+      class="{sectionVisibility === 0
+        ? 'hidden'
+        : ''} btn z-50 rounded bg-primary-500 px-3 py-2 font-bold"
+      on:click={() => {
+        scrollToSection();
+      }}>
+      {#if sectionVisibility === homePageCards.length}
+        <UpArrowIcon />
+      {:else}
+        <DownArrowIcon />
+      {/if}
     </button>
   </div>
-
-  <div style="z-index: 3;" class="relative mt-10">
-    {#each homePageCards as card}
-      <HomePageCard {card} {currentMode} />
-    {/each}
-  </div>
-</div>
-
-<div style="z-index: 3;" class="absolute-center bottom-button bottom-0">
-  <button
-    class="{sectionVisibility === 0
-      ? 'hidden'
-      : ''} btn z-50 rounded bg-primary-500 px-3 py-2 font-bold"
-    on:click={() => {
-      scrollToSection();
-    }}>
-    {#if sectionVisibility === homePageCards.length}
-      <UpArrowIcon />
-    {:else}
-      <DownArrowIcon />
-    {/if}
-  </button>
 </div>
 
 <style>
