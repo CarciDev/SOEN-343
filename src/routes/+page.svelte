@@ -207,35 +207,33 @@
   ];
 
   onMount(() => {
-  const customCursor = document.getElementById("custom-cursor");
-  let lastX = 0;
-  let rotation = 0;
-  let velocity = 0;
+    const customCursor = document.getElementById("custom-cursor");
+    let lastX = 0;
+    let rotation = 0;
+    let velocity = 0;
 
-  if (!customCursor) {
-    console.error("Custom cursor element not found!");
-    return;
-  }
+    if (!customCursor) {
+      console.error("Custom cursor element not found!");
+      return;
+    }
 
-  document.addEventListener("mousemove", (event) => {
-    customCursor.style.left = `${event.pageX}px`;
-    customCursor.style.top = `${event.pageY}px`;
+    document.addEventListener("mousemove", (event) => {
+      customCursor.style.left = `${event.pageX}px`;
+      customCursor.style.top = `${event.pageY}px`;
 
-    const deltaX = event.pageX - lastX;
+      const deltaX = event.pageX - lastX;
 
-    const targetRotation = Math.min(Math.max(deltaX * 1.8, -40), 40);
+      const targetRotation = Math.min(Math.max(deltaX * 1.8, -40), 40);
 
-    velocity += (targetRotation - rotation) * 2;
-    velocity *= 0.85;
-    rotation += velocity;
+      velocity += (targetRotation - rotation) * 2;
+      velocity *= 0.85;
+      rotation += velocity;
 
-    customCursor.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
+      customCursor.style.transform = `translate(-50%, -50%) rotate(${rotation}deg)`;
 
-    lastX = event.pageX;
+      lastX = event.pageX;
+    });
   });
-});
-
-
 </script>
 
 <div style="cursor: none;">
@@ -275,7 +273,7 @@
       </T.Group>
     </Canvas>
   </div>
-  <div class="fixed top-0 left-0">
+  <div class="fixed left-0 top-0">
     <Truck />
   </div>
 
