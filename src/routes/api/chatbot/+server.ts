@@ -1,6 +1,7 @@
 import OpenAIApi from "openai";
 import Configuration from "openai";
 import type { RequestHandler } from "@sveltejs/kit";
+import { validateAndRefreshSession } from "$lib/server/session";
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY ? process.env.OPENAI_API_KEY : "apikey",
@@ -8,8 +9,28 @@ const configuration = new Configuration({
 //@ts-expect-error configuration typing missing.
 const openai = new OpenAIApi(configuration);
 
-export const POST: RequestHandler = async ({ request }) => {
+export const POST: RequestHandler = async ({ request, cookies }) => {
   try {
+    const sessionToken = cookies.get("session"); // Get the session token from cookies
+    if (!sessionToken) {
+      return new Response(null, {
+        status: 302,
+        headers: {
+          Location: "/auth/login",
+        },
+      });
+    }
+    const session = validateAndRefreshSession(sessionToken);
+
+    if (!session.success) {
+      return new Response(null, {
+        status: 302,
+        headers: {
+          Location: "/auth/login",
+        },
+      });
+    }
+
     const { message } = await request.json();
     console.log(message);
     const response = await openai.chat.completions.create({

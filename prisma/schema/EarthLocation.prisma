@@ -1,20 +1,19 @@
 model EarthLocation {
-  id                 Int      @id @default(autoincrement())
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
-  // Street address information may or may not be present
-  address1           String?
-  address2           String?
-  city               String?
-  administartiveArea String? /// Code assigned by ISO 3166-2, without the country part
-  postalCode         String? /// With spaces, in the form of the respective country
-  countryCode        String?  @db.Char(2) /// ISO 3166-1 2-letter country code
-  lat                Float
-  lng                Float
-
-  // Prisma requires these relations be present
-  quotationsAsOrigin      Quotation[] @relation("originId")
-  quotationsAsDestination Quotation[] @relation("destinationId")
-
-  trackingEvents TrackingEvent[]
+  id                      Int             @id @default(autoincrement())
+  createdAt               DateTime        @default(now())
+  updatedAt               DateTime        @updatedAt
+  address1                String?
+  address2                String?
+  city                    String?
+  /// Code assigned by ISO 3166-2, without the country part
+  administartiveArea      String?
+  /// With spaces, in the form of the respective country
+  postalCode              String?
+  /// ISO 3166-1 2-letter country code
+  countryCode             String?         @db.Char(2)
+  lat                     Float
+  lng                     Float
+  quotationsAsDestination Quotation[]     @relation("destinationId")
+  quotationsAsOrigin      Quotation[]     @relation("originId")
+  trackingEvents          TrackingEvent[]
 }

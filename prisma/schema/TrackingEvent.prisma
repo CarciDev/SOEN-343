@@ -1,19 +1,17 @@
-enum TrackingStatus {
-  PICKED_UP_AT_ORIGIN
-  FACILITY_TRANSIT
-  OUT_FOR_DELIVERY
-  DELIVERED
-  // Theoretically there should be a tracking status for packages deemed lost, etc...
-  // but let's not complicate this project with that for now
-}
-
 model TrackingEvent {
   id                    Int                 @id @default(autoincrement())
   createdAt             DateTime            @default(now())
   updatedAt             DateTime            @updatedAt
   type                  TrackingStatus
-  location              EarthLocation       @relation(fields: [locationId], references: [id])
   locationId            Int
-  shipment              ShipmentTransaction @relation(fields: [shipmentTransactionId], references: [id])
   shipmentTransactionId Int
+  location              EarthLocation       @relation(fields: [locationId], references: [id])
+  shipment              ShipmentTransaction @relation(fields: [shipmentTransactionId], references: [id])
+}
+
+enum TrackingStatus {
+  PICKED_UP_AT_ORIGIN
+  FACILITY_TRANSIT
+  OUT_FOR_DELIVERY
+  DELIVERED
 }
