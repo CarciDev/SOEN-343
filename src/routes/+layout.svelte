@@ -51,6 +51,8 @@
   import Truck from "$lib/icons/Truck.svelte";
   import Message from "$lib/icons/Message.svelte";
   import Star from "$lib/icons/Star.svelte";
+  import { UserRole } from "@prisma/client";
+  import UserSettingsIcon from "$lib/icons/UserSettingsIcon.svelte";
 
   storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
 
@@ -108,6 +110,14 @@
       icon: Star as SvelteComponent,
     },
   ];
+
+  if (data?.user?.role === UserRole.ADMIN) {
+    links.push({
+      name: "Admin",
+      href: "/admin",
+      icon: UserSettingsIcon as SvelteComponent,
+    });
+  }
 </script>
 
 <Toast position="br" zIndex="z-[1000]" />

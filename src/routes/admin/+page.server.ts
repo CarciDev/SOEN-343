@@ -43,4 +43,16 @@ export const load: PageServerLoad = async ({ locals }) => {
     await ShipmentTransactionRepository.getDailyPackageCount(30);
   const dailyRevenueData =
     await ShipmentTransactionRepository.getDailyRevenue(30);
+
+  return {
+    user: locals.user,
+    totalPackages30Days,
+    totalRevenue30Days,
+    totalCount,
+    deliveredCount,
+    notPickedUpCount,
+    inSystemCount,
+    dailyCountData,
+    dailyRevenueData,
+  };
 };

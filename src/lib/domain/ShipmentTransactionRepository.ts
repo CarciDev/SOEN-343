@@ -177,7 +177,7 @@ export class ShipmentTransactionRepository {
         },
       });
       returnData.push({
-        date: date.toISOString(),
+        date: date.toISOString().split("T")[0],
         count: count,
       });
     }
@@ -213,7 +213,7 @@ export class ShipmentTransactionRepository {
         sum += transaction.quotation.amountQuotedCents;
       }
       returnData.push({
-        date: date.toISOString(),
+        date: date.toISOString().split("T")[0],
         revenue: sum,
       });
     }
