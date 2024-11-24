@@ -41,6 +41,8 @@
 
   let coordsValue = "";
 
+  // GeolocationPosition trips up eslint, it's a spec object
+  // eslint-disable-next-line no-undef
   async function updateFromGeolocation(position: GeolocationPosition) {
     coordsValue = `${position.coords.latitude}, ${position.coords.longitude}`;
   }

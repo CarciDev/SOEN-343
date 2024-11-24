@@ -1,5 +1,4 @@
 <script lang="ts">
-  import CancelIcon from "$lib/icons/CancelIcon.svelte";
   import { formatAmount } from "$lib/utils";
   import { Pie, Line } from "svelte-chartjs";
   import {

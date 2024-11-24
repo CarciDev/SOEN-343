@@ -151,9 +151,11 @@ export class ShipmentTransactionRepository {
   // Used for the following methods
   static getDatesSince(daysBack: number): Date[] {
     const endDate = new Date();
-    let startDate = new Date(new Date().setDate(endDate.getDate() - daysBack));
+    const startDate = new Date(
+      new Date().setDate(endDate.getDate() - daysBack),
+    );
     const dateList = [];
-    let index = new Date(startDate.getTime());
+    const index = new Date(startDate.getTime());
     while (index <= endDate) {
       dateList.push(new Date(index));
       index.setDate(index.getDate() + 1);

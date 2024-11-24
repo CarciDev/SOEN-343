@@ -1,5 +1,4 @@
 import { prisma } from "$lib/db/client";
-import { track } from "@vercel/analytics";
 import { TrackingEvent } from "./TrackingEvent";
 import type { TrackingStatus } from "./TrackingStatus";
 
