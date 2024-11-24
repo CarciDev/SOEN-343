@@ -108,6 +108,13 @@
       icon: Star as SvelteComponent,
     },
   ];
+
+  const currentYear: number = new Date().getFullYear();
+  const startingYear: number = 2024;
+  const yearDisplay: string =
+    currentYear > startingYear
+      ? `${startingYear} - ${currentYear}`
+      : `${startingYear}`;
 </script>
 
 <Toast position="br" zIndex="z-[1000]" />
@@ -144,7 +151,7 @@
               {initials}
               background="bg-tertiary-500"
               width="w-12"
-              border="border-4 border-surface-300-600-token hover:!border-primary-500"
+              border="border-4 border-surface-300-600-token hover:!border-primary-500 transition-colors"
               cursor="cursor-pointer" />
           </div>
           <ProfilePopup user={data.user} />
@@ -158,10 +165,21 @@
     <footer
       class="py-20 text-center"
       style="background-color: var(--color-surface-800);">
-      <div class="footer-links">
-        <!-- <a href="/contact-us" class="p-2">Contact Us</a> -->
+      <div
+        class="mx-auto w-full max-w-screen-xl p-4 md:flex md:items-center md:justify-between">
+        <span
+          class="text-sm text-neutral-500 dark:text-neutral-400 sm:text-center">
+          © {yearDisplay}
+          <a href="/" class="hover:underline">SvelteShipSolutions</a>. All
+          Rights Reserved.
+        </span>
+        <ul
+          class="mt-3 flex flex-wrap items-center text-sm font-medium text-neutral-500 dark:text-neutral-400 sm:mt-0">
+          <li>
+            <a href="/about" class="me-4 hover:underline md:me-6">About</a>
+          </li>
+        </ul>
       </div>
-      <div>© 2024 SvelteShip. All rights reserved.</div>
     </footer>
   </svelte:fragment>
 </AppShell>
