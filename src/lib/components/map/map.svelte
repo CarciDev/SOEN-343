@@ -4,8 +4,6 @@
   import { key } from "$lib/components/map";
   import { modeCurrent } from "@skeletonlabs/skeleton";
 
-  import "leaflet/dist/leaflet.css";
-
   export let mapLat: number;
   export let mapLon: number;
   export let zoom: number;
@@ -191,6 +189,8 @@
 {/if}
 
 <style scoped>
+  @import "https://unpkg.com/leaflet@1.7.1/dist/leaflet.css";
+
   .map {
     position: absolute;
     top: 0;
