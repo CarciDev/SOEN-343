@@ -3,7 +3,12 @@
 
   // State variables
   let userInput = "";
-  let messages: { sender: "user" | "bot"; text: string }[] = [];
+  let messages: { sender: "user" | "bot"; text: string }[] = [
+    {
+      sender: "bot",
+      text: "👋 Hello! I'm your friendly chatbot assistant. How can I help you today?",
+    },
+  ];
   let chatBox: HTMLDivElement;
 
   // Function to send a message

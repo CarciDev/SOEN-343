@@ -11,10 +11,16 @@ const openai = new OpenAIApi(configuration);
 export const POST: RequestHandler = async ({ request }) => {
   try {
     const { message } = await request.json();
-    console.log(message);
     const response = await openai.chat.completions.create({
       model: "gpt-3.5-turbo",
-      messages: [{ role: "user", content: message }],
+      messages: [
+        {
+          role: "system",
+          content:
+            "You are a customer support chatbot for SvelteShip, a web-based delivery system similar to Canada Post. Assist users with tracking orders, providing shipping information, and answering general questions about SvelteShip services.",
+        },
+        { role: "user", content: message },
+      ],
       max_tokens: 2048,
       n: 1,
       temperature: 0.7,
