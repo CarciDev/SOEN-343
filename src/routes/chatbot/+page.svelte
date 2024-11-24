@@ -8,7 +8,7 @@
     const response = await fetch('/api/check-session');
     const data = await response.json();
     if (!data.loggedIn) {
-      await goto('/auth/login');
+      goto('/auth/login');
       return false;
     }
     return true;
@@ -18,7 +18,7 @@
   onMount(async () => {
     const loggedIn = await checkLogin();
     if (!loggedIn) {
-      await goto('/auth/login');
+      goto('/auth/login');
     }
   });
 </script>
