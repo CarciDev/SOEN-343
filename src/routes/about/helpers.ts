@@ -16,6 +16,13 @@ export const attributionsData: Attribution[] = [
     licenseUrl: "https://github.com/moby/moby/blob/master/LICENSE",
   },
   {
+    name: "Font Awesome",
+    resourceUrl: "https://fontawesome.com/",
+    description: "A font and icon toolkit based on CSS and Less.",
+    license: "SIL Open Font License 1.1, MIT License, and CC BY 4.0 License",
+    licenseUrl: "https://fontawesome.com/license",
+  },
+  {
     name: "GIMP",
     resourceUrl: "https://www.gimp.org/",
     description: "A free and open-source image editor.",
@@ -105,6 +112,16 @@ export const attributionsData: Attribution[] = [
     description: "A payment processing service.",
     license: "Stripe Services Agreement",
     licenseUrl: "https://stripe.com/en-ca/legal/ssa",
+  },
+  {
+    name: "Svelte Google Places Autocomplete",
+    resourceUrl:
+      "https://github.com/silinternational/svelte-google-places-autocomplete",
+    description:
+      "A Svelte component for using the Google Places Autocomplete API.",
+    license: "MIT License",
+    licenseUrl:
+      "https://github.com/silinternational/svelte-google-places-autocomplete/blob/master/LICENSE",
   },
   {
     name: "SvelteKit",
