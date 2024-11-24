@@ -1,7 +1,7 @@
-import type { Load } from "@sveltejs/kit";
+import type { RequestEvent } from "@sveltejs/kit";
 import { validateAndRefreshSession } from "$lib/server/session";
 
-export const load: Load = async ({ cookies }) => {
+export const load = async ({ cookies }: RequestEvent) => {
   const sessionToken = cookies.get("session");
 
   if (!sessionToken) {

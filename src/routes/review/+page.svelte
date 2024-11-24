@@ -4,6 +4,14 @@
   import { createEventDispatcher } from "svelte";
   const dispatch = createEventDispatcher();
 
+  import { page } from "$app/stores";
+  $: {
+    const { data } = $page;
+    if (!data.user) {
+      window.location.href = "/auth/login";
+    }
+  }
+
   let overallRating = 0;
   let deliveryRating = 0;
   let wasDeliveryOnTime: boolean | null = null;
@@ -114,7 +122,10 @@
       const formData = new FormData();
       formData.append("rating", overallRating.toString());
       formData.append("deliveryRating", deliveryRating.toString());
-      formData.append("wasDeliveryOnTime", wasDeliveryOnTime.toString());
+      formData.append(
+        "wasDeliveryOnTime",
+        wasDeliveryOnTime !== null ? wasDeliveryOnTime.toString() : "",
+      );
 
       if (comment.trim()) {
         formData.append("comment", comment);
