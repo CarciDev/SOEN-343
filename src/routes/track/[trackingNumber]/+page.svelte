@@ -134,7 +134,7 @@
             senderMarkerLabel={data.origin?.address1 ?? "Sender"}
             receiverMarkerLabel={data.destination?.address1 ?? "Receiver"}
             trackingStatus={latestEvent
-              ? formatTrackingStatus(latestEvent.type)
+              ? latestEvent.type
               : "PICKED_UP_AT_ORIGIN"} />
         </Map>
       </div>

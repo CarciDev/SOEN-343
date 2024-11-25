@@ -6,6 +6,7 @@
   import markerIconUrl from "$lib/icons/map/marker-icon.png";
   import shadowMarkerIconUrl from "$lib/icons/map/marker-shadow.png";
   import retinaMarkerIconUrl from "$lib/icons/map/marker-icon-2x.png";
+  import { formatTrackingStatus } from "$lib/utils";
 
   export let senderLat: number;
   export let senderLon: number;
@@ -39,7 +40,7 @@
     trackingStatus: string,
   ): LatLngLiteral => {
     let percentage: number;
-    switch (trackingStatus) {
+    switch (trackingStatus.toUpperCase()) {
       case "PICKED_UP_AT_ORIGIN":
         percentage = 0.1;
         break;
@@ -47,7 +48,7 @@
         percentage = 0.5;
         break;
       case "OUT_FOR_DELIVERY":
-        percentage = 0.9;
+        percentage = 0.8;
         break;
       case "DELIVERED":
         return coordinates[coordinates.length - 1]; // Receiver's location
@@ -112,7 +113,7 @@
         .marker([deliveryCoords.lat, deliveryCoords.lng], {
           icon: defIcon,
         })
-        .bindPopup(`Delivery Status: ${trackingStatus}`);
+        .bindPopup(`Delivery Status: ${formatTrackingStatus(trackingStatus)}`);
 
       deliveryMarker.addTo(map);
 
