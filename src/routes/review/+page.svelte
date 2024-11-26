@@ -31,7 +31,7 @@
 
     try {
       const parsedSelection = JSON.parse(selectedTrackingNumber);
-      const { trackingNumber, transactionId } = parsedSelection;
+      const { transactionId } = parsedSelection;
 
       isTrackingNumberValid = true;
 
@@ -52,7 +52,7 @@
 
   $: ({ deliveredTrackingNumbers } = data);
 
-  const { form, errors, enhance } = superForm(data.form, {
+  const { form, enhance } = superForm(data.form, {
     resetForm: true,
     taintedMessage: () => {
       return new Promise((resolve) => {
@@ -66,7 +66,7 @@
     },
     onResult: ({ result }) => {
       switch (result.type) {
-        case "success":
+        case "success": {
           const successToast: ToastSettings = {
             message: "✔️ Thanks for the feedback.",
             background: "variant-filled-success",
@@ -74,14 +74,16 @@
           toastStore.trigger(successToast);
           isFormSubmitted = true; // Show thank-you section
           break;
+        }
         case "error":
-        case "failure":
+        case "failure": {
           const errorToast: ToastSettings = {
             message: "❌ Failed to submit feedback.",
             background: "variant-filled-error",
           };
           toastStore.trigger(errorToast);
           break;
+        }
       }
     },
   });
