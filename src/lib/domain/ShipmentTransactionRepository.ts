@@ -94,4 +94,49 @@ export class ShipmentTransactionRepository {
     }
     return [];
   }
+
+  static async findDeliveredTransactionsWithoutReview(userId: number) {
+    const deliveredTransactions = await prisma.shipmentTransaction.findMany({
+      where: {
+        shipperId: userId, // Filter by the shipper (user) ID
+        trackingEvents: { some: { type: "DELIVERED" } }, // Must have a "DELIVERED" event
+        Review: null, // No associated review exists
+      },
+      include: { trackingEvents: true },
+    });
+
+    return deliveredTransactions
+      .filter(
+        (transaction) =>
+          transaction.trackingEvents.sort(
+            (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+          )[0]?.type === "DELIVERED", // Verify that the last tracking event is indeed "DELIVERED"
+      )
+      .map((t) => ({
+        shipmentTransactionId: t.id,
+        trackingNumber: t.trackingNumber,
+      }));
+  }
+
+  static async validateTransactionForReview(
+    transactionId: number,
+    userId: number,
+  ) {
+    const transaction = await prisma.shipmentTransaction.findUnique({
+      where: { id: transactionId },
+      include: { trackingEvents: true },
+    });
+
+    if (
+      !transaction ||
+      transaction.shipperId !== userId || // Verify that it belongs to the user
+      transaction.trackingEvents.sort(
+        (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+      )[0]?.type !== "DELIVERED" // Verify that last event is "DELIVERED"
+    ) {
+      return false;
+    }
+
+    return true;
+  }
 }
