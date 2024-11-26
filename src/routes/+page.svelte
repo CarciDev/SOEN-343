@@ -283,8 +283,7 @@
     data-section="0">
     <div
       class="relative flex h-5/6 flex-col items-center justify-center space-y-6">
-      <div
-        class="text-center text-7xl font-extrabold">
+      <div class="text-center text-7xl font-extrabold">
         Welcome to SvelteShip Solutions
       </div>
 
