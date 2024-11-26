@@ -118,14 +118,13 @@
       icon: UserSettingsIcon as SvelteComponent,
     });
   }
-  
+
   const currentYear: number = new Date().getFullYear();
   const startingYear: number = 2024;
   const yearDisplay: string =
     currentYear > startingYear
       ? `${startingYear} - ${currentYear}`
       : `${startingYear}`;
-
 </script>
 
 <Toast position="br" zIndex="z-[1000]" />

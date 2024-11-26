@@ -2,7 +2,7 @@
   import Map from "$lib/components/map/map.svelte";
   import { formatDbReservationDate, formatTrackingStatus } from "$lib/utils.js";
   import GameFacade from "$lib/components/Game/GameFacade.svelte";
-  import { onMount } from "svelte"
+  import { onMount } from "svelte";
   import { UserRole } from "@prisma/client";
   import RoutingMachine from "$lib/components/map/routingMachine.svelte";
   import { calculateZoomLevel, getDistance } from "./helpers.js";
