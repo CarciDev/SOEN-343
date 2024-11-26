@@ -53,7 +53,6 @@
   import ClipboardListIcon from "$lib/icons/ClipboardListIcon.svelte";
   import Dollar from "$lib/icons/Dollar.svelte";
   import Truck from "$lib/icons/Truck.svelte";
-  import Message from "$lib/icons/Message.svelte";
   import Star from "$lib/icons/Star.svelte";
 
   storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
@@ -108,7 +107,6 @@
     },
   ];
 
-
   // Store to manage chatbot visibility
   const isChatbotOpen = writable(false);
 
@@ -123,7 +121,6 @@
     currentYear > startingYear
       ? `${startingYear} - ${currentYear}`
       : `${startingYear}`;
-
 </script>
 
 <Toast position="br" zIndex="z-[1000]" />
