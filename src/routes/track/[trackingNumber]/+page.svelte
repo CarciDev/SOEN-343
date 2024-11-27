@@ -3,6 +3,7 @@
   import { formatDbReservationDate, formatTrackingStatus } from "$lib/utils.js";
   import GameFacade from "$lib/components/Game/GameFacade.svelte";
   import { onMount } from "svelte";
+  import { UserRole } from "@prisma/client";
   import RoutingMachine from "$lib/components/map/routingMachine.svelte";
   import { calculateZoomLevel, getDistance } from "./helpers.js";
 
@@ -35,7 +36,7 @@
   </h2>
 
   <!-- Information about origin, destination, and status -->
-  <div class="mb-6 columns-3">
+  <div class="mb-6 grid grid-cols-3 gap-4">
     <div class="card p-4">
       <h3 class="text-xl font-bold">Origin</h3>
       {data.origin?.address1 || ""}{#if data.origin?.address1}<br />{/if}
@@ -44,7 +45,6 @@
       {data.origin?.administrativeArea || ""}
       {data.origin?.postalCode || ""}{#if data.origin?.city}<br />{/if}
       {data.origin?.countryCode || ""}
-      <br /><br />
     </div>
     <div class="card p-4">
       <h3 class="text-xl font-bold">Destination</h3>
@@ -57,7 +57,6 @@
       {data.destination?.postalCode ||
         ""}{#if data.destination?.city}<br />{/if}
       {data.destination?.countryCode || ""}
-      <br /><br />
     </div>
     <div class="card p-4">
       <div class="text-xl font-bold">Status</div>
@@ -134,11 +133,20 @@
             senderMarkerLabel={data.origin?.address1 ?? "Sender"}
             receiverMarkerLabel={data.destination?.address1 ?? "Receiver"}
             trackingStatus={latestEvent
-              ? formatTrackingStatus(latestEvent.type)
+              ? latestEvent.type
               : "PICKED_UP_AT_ORIGIN"} />
         </Map>
       </div>
     </div>
     <GameFacade />
   </div>
+
+  {#if data.user?.role == UserRole.ADMIN}
+    <div class="m-4 text-center">
+      <a
+        class="underline"
+        href="/admin/update-tracking?trackingNumber={data.transaction
+          .trackingNumber}">Update tracking</a>
+    </div>
+  {/if}
 </div>

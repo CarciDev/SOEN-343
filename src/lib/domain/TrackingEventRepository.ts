@@ -10,11 +10,18 @@ export class TrackingEventRepository {
       shipmentTransactionId: trackingEvent.shipmentTransactionId,
     };
 
-    const savedTrackingEvent = await prisma.trackingEvent.upsert({
-      where: { id: trackingEvent.id },
-      update: dataFields,
-      create: dataFields,
-    });
+    let savedTrackingEvent;
+    if (trackingEvent.id) {
+      savedTrackingEvent = await prisma.trackingEvent.upsert({
+        where: { id: trackingEvent.id },
+        update: dataFields,
+        create: dataFields,
+      });
+    } else {
+      savedTrackingEvent = await prisma.trackingEvent.create({
+        data: dataFields,
+      });
+    }
 
     trackingEvent.id = savedTrackingEvent.id;
     trackingEvent.createdAt = savedTrackingEvent.createdAt;

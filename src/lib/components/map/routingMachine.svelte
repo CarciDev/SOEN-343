@@ -2,10 +2,11 @@
   import { onMount } from "svelte";
   import { getContext } from "svelte";
   import { key, type MapContext } from "$lib/components/map";
-  import senderIconURL from "$lib/icons/map/sender-marker-icon.png";
-  import receiverIconURL from "$lib/icons/map/receiver-marker-icon.png";
-  import trackingEventIconURL from "$lib/icons/map/tracking-event-icon.png";
   import type { LatLngLiteral } from "leaflet";
+  import markerIconUrl from "$lib/icons/map/marker-icon.png";
+  import shadowMarkerIconUrl from "$lib/icons/map/marker-shadow.png";
+  import retinaMarkerIconUrl from "$lib/icons/map/marker-icon-2x.png";
+  import { formatTrackingStatus } from "$lib/utils";
 
   export let senderLat: number;
   export let senderLon: number;
@@ -20,39 +21,26 @@
   const map = getMap();
   const leaflet = getLeaflet();
 
-  const senderIcon = leaflet.icon({
-    iconUrl: senderIconURL,
-    iconSize: [50, 80],
-    iconAnchor: [25, 80],
-    popupAnchor: [0, -40],
-  });
-
-  const receiverIcon = leaflet.icon({
-    iconUrl: receiverIconURL,
-    iconSize: [50, 80],
-    iconAnchor: [25, 80],
-    popupAnchor: [0, -40],
-  });
-
-  const deliveryIcon = leaflet.icon({
-    iconUrl: trackingEventIconURL,
-    iconSize: [50, 80],
-    iconAnchor: [25, 80],
-    popupAnchor: [0, -40],
+  const defIcon = leaflet.icon({
+    iconUrl: markerIconUrl,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [0, -41],
+    shadowUrl: shadowMarkerIconUrl,
+    shadowSize: [41, 41],
+    shadowAnchor: [12, 41],
+    iconRetinaUrl: retinaMarkerIconUrl,
   });
 
   /**
    * Calculate the position of the delivery marker based on the tracking status.
-   * @param coordinates - Array of route coordinates.
-   * @param trackingStatus - The current tracking status.
-   * @returns {LatLngLiteral} The calculated coordinates for the delivery marker.
    */
   const getRoutePositionByStatus = (
     coordinates: LatLngLiteral[],
     trackingStatus: string,
   ): LatLngLiteral => {
     let percentage: number;
-    switch (trackingStatus) {
+    switch (trackingStatus.toUpperCase()) {
       case "PICKED_UP_AT_ORIGIN":
         percentage = 0.1;
         break;
@@ -60,23 +48,25 @@
         percentage = 0.5;
         break;
       case "OUT_FOR_DELIVERY":
-        percentage = 0.9;
+        percentage = 0.8;
         break;
       case "DELIVERED":
         return coordinates[coordinates.length - 1]; // Receiver's location
       default:
         percentage = 0.1;
     }
+
     const index = Math.floor(percentage * (coordinates.length - 1));
+
     return coordinates[index];
   };
 
   /**
    * Lifecycle hook: Runs when the component is mounted to the DOM.
-   * Makes sure the map is initialized, calculates the route, and places markers.
    */
   onMount(async () => {
     const L = (await import("leaflet")).default;
+
     await import("leaflet-routing-machine");
 
     const routingControl = L.Routing.control({
@@ -86,11 +76,13 @@
         L.latLng(senderLat, senderLon),
         L.latLng(receiverLat, receiverLon),
       ],
-      //@ts-expect-error Object literal may only specify known properties, and 'draggableWaypoints' does not exist in type 'RoutingControlOptions'.ts(2353)
+      //@ts-expect-error Ignore specific TypeScript error
       draggableWaypoints: false,
       routeWhileDragging: false,
       addWaypoints: false,
-      createMarker: () => null, // Disable default markers
+      createMarker: function () {
+        return null;
+      },
     }).addTo(map);
 
     routingControl.on("routesfound", (e) => {
@@ -102,24 +94,37 @@
         trackingStatus,
       );
 
-      // Add the markers with custom icons after the route has been generated
-      leaflet
-        .marker([senderLat, senderLon], { icon: senderIcon })
-        .addTo(map)
+      // Add sender marker
+      const senderMarker = leaflet
+        .marker([senderLat, senderLon], { icon: defIcon })
         .bindPopup(`${senderMarkerLabel}`);
-      leaflet
-        .marker([receiverLat, receiverLon], { icon: receiverIcon })
-        .addTo(map)
+
+      senderMarker.addTo(map);
+
+      // Add receiver marker
+      const receiverMarker = leaflet
+        .marker([receiverLat, receiverLon], { icon: defIcon })
         .bindPopup(`${receiverMarkerLabel}`);
-      leaflet
+
+      receiverMarker.addTo(map);
+
+      // Add delivery marker
+      const deliveryMarker = leaflet
         .marker([deliveryCoords.lat, deliveryCoords.lng], {
-          icon: deliveryIcon,
+          icon: defIcon,
         })
-        .addTo(map)
-        .bindPopup(`Delivery Status: ${trackingStatus}`);
+        .bindPopup(`Delivery Status: ${formatTrackingStatus(trackingStatus)}`);
+
+      deliveryMarker.addTo(map);
+
+      // there is an issue related to rendering Leaflet markers in production: https://github.com/Leaflet/Leaflet/issues/4968
+      // a workaround for this is to add the image URLs from a different path
+      // and (for an unknown reason) render a marker w/o an icon specified (it's placed out of map bounds to "hide" it)
+      const foo = leaflet.marker([90.99346179538875, 181]);
+      foo.addTo(map);
     });
 
-    // Hide routing container
+    // Hide leaflet-routing-machine routing container
     setTimeout(() => {
       const routingContainer = document.querySelector(
         ".leaflet-routing-container",

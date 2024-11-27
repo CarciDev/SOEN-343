@@ -3,7 +3,6 @@
   import { T } from "@threlte/core";
   import { onMount } from "svelte";
   import { tweened } from "svelte/motion";
-  import { fade } from "svelte/transition";
   import type { TypedArray } from "three";
   import { get, writable } from "svelte/store";
   import { modeCurrent } from "@skeletonlabs/skeleton";
@@ -284,15 +283,12 @@
     data-section="0">
     <div
       class="relative flex h-5/6 flex-col items-center justify-center space-y-6">
-      <div
-        transition:fade={{ delay: 250, duration: 300 }}
-        class="text-center text-7xl font-extrabold">
+      <div class="text-center text-7xl font-extrabold">
         Welcome to SvelteShip Solutions
       </div>
 
       <button
         on:click={scrollToSection}
-        transition:fade={{ delay: 250, duration: 300 }}
         class="variant-filled-primary btn mx-auto block"
         style="z-index: 3;">
         Begin

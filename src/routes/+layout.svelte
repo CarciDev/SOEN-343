@@ -54,6 +54,8 @@
   import Dollar from "$lib/icons/Dollar.svelte";
   import Truck from "$lib/icons/Truck.svelte";
   import Star from "$lib/icons/Star.svelte";
+  import { UserRole } from "@prisma/client";
+  import UserSettingsIcon from "$lib/icons/UserSettingsIcon.svelte";
 
   storePopup.set({ computePosition, autoUpdate, offset, shift, flip, arrow });
 
@@ -113,6 +115,14 @@
   // Function to toggle chatbot
   function toggleChatbot() {
     isChatbotOpen.update((open) => !open);
+  }
+
+  if (data?.user?.role === UserRole.ADMIN) {
+    links.push({
+      name: "Admin",
+      href: "/admin",
+      icon: UserSettingsIcon as SvelteComponent,
+    });
   }
 
   const currentYear: number = new Date().getFullYear();
