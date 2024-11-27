@@ -198,7 +198,7 @@
     <div class="fixed bottom-6 right-6 z-[9999]">
       <button
         on:click={toggleChatbot}
-        class="rounded-full bg-orange-500 p-4 text-white shadow-lg transition-colors duration-300 hover:bg-orange-600"
+        class="rounded-full bg-primary-500 p-4 text-white shadow-lg transition-colors duration-300 hover:bg-orange-600"
         aria-label="Open Chat">
         {#if $isChatbotOpen}
           <svg
