@@ -76,7 +76,7 @@
         <div
           class={`max-w-xs rounded-lg px-4 py-2 shadow ${
             message.sender === "user"
-              ? "text-white dark:bg-primary-500"
+              ? "bg-primary-500 text-white"
               : message.text.toLowerCase().includes("error")
                 ? "bg-error-500 text-white"
                 : "bg-surface-200 text-gray-800 dark:bg-surface-600 dark:text-gray-100"
