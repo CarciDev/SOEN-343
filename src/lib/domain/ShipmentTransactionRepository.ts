@@ -69,7 +69,6 @@ export class ShipmentTransactionRepository {
   static async findByTrackingNumber(
     trackingNumber: string,
   ): Promise<ShipmentTransaction | null> {
-    // Piggyback off object-build in find by id
     const dbResult = await prisma.shipmentTransaction.findUnique({
       select: { id: true },
       where: { trackingNumber: trackingNumber },
@@ -95,6 +94,51 @@ export class ShipmentTransactionRepository {
     return [];
   }
 
+  static async findDeliveredTransactionsWithoutReview(userId: number) {
+    const deliveredTransactions = await prisma.shipmentTransaction.findMany({
+      where: {
+        shipperId: userId, // Filter by the shipper (user) ID
+        trackingEvents: { some: { type: "DELIVERED" } }, // Must have a "DELIVERED" event
+        Review: null, // No associated review exists
+      },
+      include: { trackingEvents: true },
+    });
+
+    return deliveredTransactions
+      .filter(
+        (transaction) =>
+          transaction.trackingEvents.sort(
+            (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+          )[0]?.type === "DELIVERED", // Verify that the last tracking event is indeed "DELIVERED"
+      )
+      .map((t) => ({
+        shipmentTransactionId: t.id,
+        trackingNumber: t.trackingNumber,
+      }));
+  }
+
+  static async validateTransactionForReview(
+    transactionId: number,
+    userId: number,
+  ) {
+    const transaction = await prisma.shipmentTransaction.findUnique({
+      where: { id: transactionId },
+      include: { trackingEvents: true },
+    });
+
+    if (
+      !transaction ||
+      transaction.shipperId !== userId || // Verify that it belongs to the user
+      transaction.trackingEvents.sort(
+        (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
+      )[0]?.type !== "DELIVERED" // Verify that last event is "DELIVERED"
+    ) {
+      return false;
+    }
+
+    return true;
+  }
+
   static async getTotalPackages(daysBack: number): Promise<number> {
     const count = await prisma.shipmentTransaction.count({
       where: {
@@ -107,7 +151,6 @@ export class ShipmentTransactionRepository {
   }
 
   static async getTotalRevenue(daysBack: number): Promise<number> {
-    // There's no way to do a .aggregate() across a relational boundary
     let sum = 0;
     const transactions = await prisma.shipmentTransaction.findMany({
       select: {
@@ -148,7 +191,6 @@ export class ShipmentTransactionRepository {
     return packageObjects;
   }
 
-  // Used for the following methods
   static getDatesSince(daysBack: number): Date[] {
     const endDate = new Date();
     const startDate = new Date(
@@ -194,7 +236,6 @@ export class ShipmentTransactionRepository {
     const returnData: { date: string; revenue: number }[] = [];
 
     for (const date of dateList) {
-      // There's no way to do a .aggregate() across a relational boundary
       let sum = 0;
       const transactions = await prisma.shipmentTransaction.findMany({
         select: {

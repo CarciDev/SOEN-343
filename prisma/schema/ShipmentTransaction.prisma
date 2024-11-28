@@ -20,4 +20,6 @@ model ShipmentTransaction {
   shipperId Int
 
   trackingEvents TrackingEvent[]
+
+  Review Review?
 }

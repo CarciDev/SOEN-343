@@ -5,6 +5,7 @@ const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
 
 export const stripe = stripeSecretKey
   ? new Stripe(stripeSecretKey, {
+      //@ts-expect-error Type expects latest version "2024-11-20.acacia" instead of current "2024-10-28.acacia"
       apiVersion: "2024-10-28.acacia",
     })
   : null;
