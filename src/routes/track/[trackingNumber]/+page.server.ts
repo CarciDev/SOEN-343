@@ -14,11 +14,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 
   if (!transaction) error(404, "Parcel not found");
 
-  console.log(params.trackingNumber);
-
   const quotation = await QuotationRepository.findById(transaction.id!);
-
-  console.log(quotation);
 
   const origin = await EarthLocationRepository.findById(quotation!.originId);
   const destination = await EarthLocationRepository.findById(

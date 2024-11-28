@@ -69,7 +69,6 @@ export class ShipmentTransactionRepository {
   static async findByTrackingNumber(
     trackingNumber: string,
   ): Promise<ShipmentTransaction | null> {
-    // Piggyback off object-build in find by id
     const dbResult = await prisma.shipmentTransaction.findUnique({
       select: { id: true },
       where: { trackingNumber: trackingNumber },
@@ -138,5 +137,130 @@ export class ShipmentTransactionRepository {
     }
 
     return true;
+  }
+
+  static async getTotalPackages(daysBack: number): Promise<number> {
+    const count = await prisma.shipmentTransaction.count({
+      where: {
+        createdAt: {
+          gte: new Date(new Date().setDate(new Date().getDate() - daysBack)),
+        },
+      },
+    });
+    return count;
+  }
+
+  static async getTotalRevenue(daysBack: number): Promise<number> {
+    let sum = 0;
+    const transactions = await prisma.shipmentTransaction.findMany({
+      select: {
+        quotation: {
+          select: {
+            amountQuotedCents: true,
+          },
+        },
+      },
+      where: {
+        createdAt: {
+          gte: new Date(new Date().setDate(new Date().getDate() - daysBack)),
+        },
+      },
+    });
+    for (const transaction of transactions) {
+      sum += transaction.quotation.amountQuotedCents;
+    }
+    return sum;
+  }
+
+  static async findByCreatedSince(
+    daysBack: number,
+  ): Promise<ShipmentTransaction[]> {
+    const packageObjects: ShipmentTransaction[] = [];
+    const dbResult = await prisma.shipmentTransaction.findMany({
+      select: { id: true },
+      where: {
+        createdAt: {
+          gte: new Date(new Date().setDate(new Date().getDate() - daysBack)),
+        },
+      },
+    });
+    for (const result of dbResult) {
+      const packageObject = await this.findById(result.id);
+      if (packageObject) packageObjects.push(packageObject);
+    }
+    return packageObjects;
+  }
+
+  static getDatesSince(daysBack: number): Date[] {
+    const endDate = new Date();
+    const startDate = new Date(
+      new Date().setDate(endDate.getDate() - daysBack),
+    );
+    const dateList = [];
+    const index = new Date(startDate.getTime());
+    while (index <= endDate) {
+      dateList.push(new Date(index));
+      index.setDate(index.getDate() + 1);
+    }
+    return dateList;
+  }
+
+  static async getDailyPackageCount(
+    daysBack: number,
+  ): Promise<{ date: string; count: number }[]> {
+    const dateList = this.getDatesSince(daysBack);
+    const returnData: { date: string; count: number }[] = [];
+
+    for (const date of dateList) {
+      const count = await prisma.shipmentTransaction.count({
+        where: {
+          createdAt: {
+            gt: new Date(new Date().setDate(date.getDate() - 1)),
+            lte: date,
+          },
+        },
+      });
+      returnData.push({
+        date: date.toISOString().split("T")[0],
+        count: count,
+      });
+    }
+
+    return returnData;
+  }
+
+  static async getDailyRevenue(
+    daysBack: number,
+  ): Promise<{ date: string; revenue: number }[]> {
+    const dateList = this.getDatesSince(daysBack);
+    const returnData: { date: string; revenue: number }[] = [];
+
+    for (const date of dateList) {
+      let sum = 0;
+      const transactions = await prisma.shipmentTransaction.findMany({
+        select: {
+          quotation: {
+            select: {
+              amountQuotedCents: true,
+            },
+          },
+        },
+        where: {
+          createdAt: {
+            gt: new Date(new Date().setDate(date.getDate() - 1)),
+            lte: date,
+          },
+        },
+      });
+      for (const transaction of transactions) {
+        sum += transaction.quotation.amountQuotedCents;
+      }
+      returnData.push({
+        date: date.toISOString().split("T")[0],
+        revenue: sum,
+      });
+    }
+
+    return returnData;
   }
 }

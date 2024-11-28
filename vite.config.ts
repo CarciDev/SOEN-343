@@ -4,6 +4,12 @@ import { defineConfig } from "vitest/config";
 import { purgeCss } from "vite-plugin-tailwind-purgecss";
 
 export default defineConfig({
+  resolve: {
+    alias: {
+      ".prisma/client/index-browser":
+        "./node_modules/.prisma/client/index-browser.js",
+    },
+  },
   plugins: [
     sveltekit(),
     purgeCss({
