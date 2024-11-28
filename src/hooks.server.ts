@@ -2,7 +2,7 @@ import { redirect } from "@sveltejs/kit";
 import { validateAndRefreshSession } from "$lib/server/session";
 import type { Handle } from "@sveltejs/kit";
 
-const openRoutes = /^(\/|\/auth\/(login|logout|register)|\/api\/stripe\/webhook|\/track(\/.*)?|\/quotation|\/rates-calculator|\/about)$/;
+const openRoutes = /^(\/|\/auth\/(login|logout|register)|\/api\/stripe\/webhook|\/track(\/.*)?|\/api\/chatbot|\/quotation|\/rates-calculator\/|\/about|)$/;
 
 export const handle: Handle = async ({ event, resolve }) => {
   const session = String(event.cookies.get("SvelteShip-Session") || "");

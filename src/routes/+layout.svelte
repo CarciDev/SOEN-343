@@ -15,6 +15,10 @@
   import "../app.postcss";
   import { dev } from "$app/environment";
   import { inject } from "@vercel/analytics";
+  import { page } from "$app/stores";
+  import { writable } from "svelte/store";
+  import ChatBox from "$lib/components/ChatBox.svelte";
+  import { fade } from "svelte/transition";
   inject({ mode: dev ? "development" : "production" });
 
   import {
@@ -49,7 +53,6 @@
   import ClipboardListIcon from "$lib/icons/ClipboardListIcon.svelte";
   import Dollar from "$lib/icons/Dollar.svelte";
   import Truck from "$lib/icons/Truck.svelte";
-  import Message from "$lib/icons/Message.svelte";
   import Star from "$lib/icons/Star.svelte";
   import { UserRole } from "@prisma/client";
   import UserSettingsIcon from "$lib/icons/UserSettingsIcon.svelte";
@@ -100,16 +103,19 @@
       icon: Truck as SvelteComponent,
     },
     {
-      name: "Support",
-      href: "/chatbot",
-      icon: Message as SvelteComponent,
-    },
-    {
       name: "Leave a Review",
       href: "/review",
       icon: Star as SvelteComponent,
     },
   ];
+
+  // Store to manage chatbot visibility
+  const isChatbotOpen = writable(false);
+
+  // Function to toggle chatbot
+  function toggleChatbot() {
+    isChatbotOpen.update((open) => !open);
+  }
 
   if (data?.user?.role === UserRole.ADMIN) {
     links.push({
@@ -193,3 +199,54 @@
     </footer>
   </svelte:fragment>
 </AppShell>
+
+<!--Check to see if user is signed in-->
+{#if data.user}
+  <!--Add urls you dont want the chatbot to appear on-->
+  {#if $page.url.pathname !== "/some-excluded-page"}
+    <!-- Floating Chatbot Button -->
+    <div class="fixed bottom-6 right-6 z-[9999]">
+      <button
+        on:click={toggleChatbot}
+        class="rounded-full bg-primary-500 p-4 text-white shadow-lg transition-colors duration-300 hover:bg-orange-600"
+        aria-label="Open Chat">
+        {#if $isChatbotOpen}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        {:else}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="h-6 w-6"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+          </svg>
+        {/if}
+      </button>
+
+      <!-- Floating Chatbot Container -->
+      {#if $isChatbotOpen}
+        <div
+          transition:fade={{ duration: 300 }}
+          class="fixed bottom-24 right-6 z-[9999] w-full max-w-md rounded-lg shadow-2xl">
+          <ChatBox />
+        </div>
+      {/if}
+    </div>
+  {/if}
+{/if}
