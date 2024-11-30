@@ -1,4 +1,4 @@
-import { error, fail, redirect } from "@sveltejs/kit";
+import { error, fail, redirect, type Actions } from "@sveltejs/kit";
 import type { PageServerLoad } from "./$types";
 import { TrackingStatus, UserRole } from "@prisma/client";
 import { z } from "zod";
@@ -22,7 +22,7 @@ const UpdateTrackingSchema = z.object({
   coords: z.string().optional(),
 });
 
-export const actions = {
+export const actions: Actions = {
   default: async ({ request }) => {
     const formData = await request.formData();
     const result = UpdateTrackingSchema.safeParse(Object.fromEntries(formData));

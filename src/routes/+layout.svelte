@@ -42,6 +42,7 @@
     Modal,
     popup,
     storePopup,
+    modeCurrent,
     type PopupSettings,
   } from "@skeletonlabs/skeleton";
   import type { ModalComponent } from "@skeletonlabs/skeleton";
@@ -149,13 +150,12 @@
           <HamburgerMenuIcon />
         </button>
         <a href="/" class="h-10">
-          <!-- <img
+          <img
             src={$modeCurrent
-              ? "/SiteLogoForDark.png"
-              : "/SiteLogoForLight.png"}
+              ? "/SiteLogoForLight.png"
+              : "/SiteLogoForDark.png"}
             alt="SvelteShip"
-            class="h-full" /> -->
-          SvelteShip (logo goes here)
+            class="h-full" />
         </a>
       </svelte:fragment>
       <NavBar {links} />
