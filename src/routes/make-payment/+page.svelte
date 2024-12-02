@@ -26,104 +26,87 @@
   });
 </script>
 
-<div class="py-28">
-  <div class="container">
-    <h1>
-      This page/route is meant to assist in demonstrating the functionality for
-      making a payment using a real quotation object. The UI will be finalized
-      and will make use of sveltekit-superforms.
-    </h1>
-    <br />
-    <h1>
-      We aim to display quotation details in an appealing way, including origin,
-      destination, and other relevant information.
-    </h1>
-    <br />
-    <h1>
-      As much information as possible will be shown before Stripe manages
-      checkout and payment processing.
-    </h1>
-  </div>
+<div class="bg-base-200 py-10">
+  <div class="container mx-auto space-y-10 px-4">
+    <!-- Header Section -->
+    <section class="text-center">
+      <h1 class="text-primary text-4xl font-bold">Quotation Payment</h1>
+      <p class="text-secondary mt-4 text-lg">
+        All payments are processed with <a
+          class="text-primary-500 underline hover:cursor-pointer"
+          href="https://stripe.com"
+          target="_blank">Stripe.</a>
+      </p>
+    </section>
 
-  <div class="bg-white font-[sans-serif]">
-    <div class="flex h-full gap-12 max-lg:gap-4 max-sm:flex-col">
-      <div
-        class="bg-gradient-to-r from-gray-800 via-gray-700 to-gray-800 sm:sticky sm:top-0 sm:h-screen sm:min-w-[300px] lg:min-w-[370px]">
-        <div class="relative h-full">
-          <div class="px-4 py-8 sm:h-[calc(100vh-60px)] sm:overflow-auto">
-            <div class="space-y-4">
-              <!-- Example of displaying the quotation details -->
-              <div class="flex items-start gap-4">
-                <div
-                  class="flex h-28 w-32 shrink-0 rounded-md bg-gray-300 p-3 max-lg:h-24 max-lg:w-24">
-                  <img
-                    src="https://static.wikia.nocookie.net/clubpenguin/images/7/7b/Box17.png"
-                    alt="Regular Box"
-                    class="w-full object-contain" />
-                </div>
-                <div class="w-full">
-                  <h3 class="text-base text-white">Package Details</h3>
-                  <ul class="mt-2 space-y-2 text-xs text-gray-300">
-                    <li class="flex flex-wrap gap-4">
-                      Origin ID <span class="ml-auto">{originId}</span>
-                    </li>
-                    <li class="flex flex-wrap gap-4">
-                      Destination ID <span class="ml-auto"
-                        >{destinationId}</span>
-                    </li>
-                    <li class="flex flex-wrap gap-4">
-                      Total Price
-                      <span class="ml-auto">
-                        {centsToDollars(amountQuotedCents)}
-                      </span>
-                    </li>
-                    <li class="flex flex-wrap gap-4">
-                      ETA (Days) <span class="ml-auto">{etaDays}</span>
-                    </li>
-                    <li class="flex flex-wrap gap-4">
-                      Box ID <span class="ml-auto">{boxId}</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-              <!-- Repeat for other package types if needed -->
-            </div>
+    <!-- Main Content Section -->
+    <div class="flex flex-col gap-8 lg:flex-row lg:items-start">
+      <!-- Quotation Details Sidebar -->
+      <aside
+        class="bg-surface flex flex-col items-center rounded-lg p-6 text-center shadow-lg lg:w-1/3 lg:items-start lg:text-left">
+        <h2 class="text-primary text-2xl font-semibold">Package Details</h2>
+        <div
+          class="mt-4 flex flex-col items-center lg:flex-row lg:items-start lg:gap-4">
+          <!-- Image -->
+          <div class="flex h-24 w-24 shrink-0 rounded-md bg-gray-300 p-3">
+            <img
+              src="https://static.wikia.nocookie.net/clubpenguin/images/7/7b/Box17.png"
+              alt="Regular Box"
+              class="h-full w-full object-contain" />
           </div>
-
-          <div
-            class="w-full space-y-3 bg-gray-800 p-4 md:absolute md:bottom-0 md:left-0">
-            <h4 class="flex flex-wrap gap-4 text-sm text-neutral-500">
-              <span class="mx-auto">Prices are shown in $CAD.</span>
-            </h4>
-            <h4 class="flex flex-wrap gap-4 text-base text-white">
-              Total
-              <span class="ml-auto">{centsToDollars(amountQuotedCents)}</span>
-            </h4>
-          </div>
+          <!-- Details List -->
+          <ul class="mt-4 space-y-4 lg:mt-0">
+            <li class="flex justify-between lg:justify-start lg:gap-4">
+              <span>Origin ID:</span>
+              <span class="font-medium">{originId}</span>
+            </li>
+            <li class="flex justify-between lg:justify-start lg:gap-4">
+              <span>Destination ID:</span>
+              <span class="font-medium">{destinationId}</span>
+            </li>
+            <li class="flex justify-between lg:justify-start lg:gap-4">
+              <span>Total Price:</span>
+              <span class="font-medium">
+                {centsToDollars(amountQuotedCents)}
+              </span>
+            </li>
+            <li class="flex justify-between lg:justify-start lg:gap-4">
+              <span>ETA (Days):</span>
+              <span class="font-medium">{etaDays}</span>
+            </li>
+            <li class="flex justify-between lg:justify-start lg:gap-4">
+              <span>Box ID:</span>
+              <span class="font-medium">{boxId}</span>
+            </li>
+          </ul>
         </div>
-      </div>
+        <div class="mt-8 text-sm text-neutral-500">
+          Prices are shown in $CAD.
+        </div>
+      </aside>
 
-      <div class="sticky top-0 h-max w-full max-w-4xl rounded-md px-4 py-8">
-        <h2 class="text-2xl font-bold text-gray-800">Checkout</h2>
-        <form class="mt-8">
-          <div class="mt-8">
-            <h3 class="mb-4 text-base text-gray-800">
-              Please review the quotation details before proceeding to payment.
-            </h3>
+      <!-- Checkout Section -->
+      <section
+        class="bg-surface flex flex-col items-center rounded-lg p-6 shadow-lg lg:w-2/3">
+        <h2
+          class="text-primary text-center text-2xl font-semibold lg:text-left">
+          Checkout
+        </h2>
+        <p class="text-secondary mt-4 text-center lg:text-left">
+          Please review the quotation details before proceeding to payment.
+        </p>
 
-            <div class="mt-8 flex gap-4 max-md:flex-col">
-              <button
-                type="button"
-                class="w-full rounded-md border border-gray-300 bg-transparent px-6 py-3 text-sm tracking-wide text-gray-800 hover:bg-gray-100 max-md:order-1"
-                >Cancel</button>
-              <a
-                href={`/api/stripe/checkout?${checkoutUrlParams.toString()}`}
-                class="w-full rounded-md bg-[#ff3e00] px-6 py-3 text-center text-sm font-medium tracking-wide text-white hover:bg-[#d93800] focus:outline-none focus:ring-4 focus:ring-[#ff6a33] dark:bg-[#ff3e00] dark:hover:bg-[#d93800] dark:focus:ring-[#ff6a33]"
-                >Complete Purchase</a>
-            </div>
-          </div>
-        </form>
-      </div>
+        <div class="mt-8 flex w-full flex-col gap-4">
+          <button type="button" class="btn-neutral variant-outline btn w-full">
+            Cancel
+          </button>
+          <a
+            href={`/api/stripe/checkout?${checkoutUrlParams.toString()}`}
+            class="variant-filled-primary btn w-full">
+            Complete Purchase
+          </a>
+        </div>
+      </section>
     </div>
   </div>
 </div>

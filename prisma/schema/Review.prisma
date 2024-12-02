@@ -1,19 +1,13 @@
 model Review {
-  id                Int      @id @default(autoincrement())
-  user              User     @relation(fields: [userId], references: [id])
-  rating            Int
-  deliveryRating    Int
-  wasDeliveryOnTime Boolean
-  comment           String?
-  userId            Int
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  images            Image[]
-}
-
-model Image {
-  id       Int    @id @default(autoincrement())
-  url      String
-  reviewId Int
-  review   Review @relation(fields: [reviewId], references: [id])
+  id                  Int                 @id @default(autoincrement())
+  user                User                @relation(fields: [userId], references: [id])
+  rating              Int
+  deliveryRating      Int
+  wasDeliveryOnTime   Boolean
+  comment             String?
+  userId              Int
+  createdAt           DateTime            @default(now())
+  updatedAt           DateTime            @updatedAt
+  shipmentTransaction ShipmentTransaction @relation(fields: [transactionId], references: [id])
+  transactionId       Int                 @unique
 }

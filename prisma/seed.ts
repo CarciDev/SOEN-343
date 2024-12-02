@@ -9,7 +9,6 @@ async function seedAll() {
     where: { id: 1 },
     update: {},
     create: {
-      id: 1,
       email: "admin@svelteship.test",
       name: "Joe Admin",
       comment: "Created from the Prisma seed file",
@@ -22,7 +21,6 @@ async function seedAll() {
     where: { id: 2 },
     update: {},
     create: {
-      id: 2,
       email: "customer@svelteship.test",
       name: "First Customer",
       comment: "Created from the Prisma seed file",
@@ -35,7 +33,6 @@ async function seedAll() {
     where: { id: 1 },
     update: {},
     create: {
-      id: 1,
       heightCm: 50,
       widthCm: 40,
       depthCm: 30,
@@ -47,7 +44,6 @@ async function seedAll() {
     where: { id: 1 },
     update: {},
     create: {
-      id: 1,
       address1: "1455 boul de Maisonneuve O",
       city: "Montreal",
       administartiveArea: "QC",
@@ -62,7 +58,6 @@ async function seedAll() {
     where: { id: 2 },
     update: {},
     create: {
-      id: 2,
       address1: "7141 rue Sherbrooke O",
       city: "Montreal",
       administartiveArea: "QC",
@@ -77,7 +72,6 @@ async function seedAll() {
     where: { id: 1 },
     update: {},
     create: {
-      id: 1,
       originId: concordia.id,
       destinationId: loyola.id,
       amountQuotedCents: 2000,
@@ -90,7 +84,6 @@ async function seedAll() {
     where: { id: 2 },
     update: {},
     create: {
-      id: 2,
       originId: concordia.id,
       destinationId: loyola.id,
       amountQuotedCents: 2000,
@@ -102,7 +95,6 @@ async function seedAll() {
     where: { id: 3 },
     update: {},
     create: {
-      id: 3,
       originId: concordia.id,
       destinationId: loyola.id,
       amountQuotedCents: 2000,
@@ -114,7 +106,6 @@ async function seedAll() {
     where: { id: 1 },
     update: {},
     create: {
-      id: 1,
       trackingNumber: "111111111111",
       quotationId: quote.id,
       transactionType: TransactionType.MANUAL,
@@ -127,7 +118,6 @@ async function seedAll() {
     where: { id: 1 },
     update: {},
     create: {
-      id: 1,
       type: TrackingStatus.PICKED_UP_AT_ORIGIN,
       locationId: concordia.id,
       shipmentTransactionId: shipment.id,

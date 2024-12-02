@@ -15,13 +15,16 @@
   flex="flex-1 lg:flex-none justify-center"
   rounded=""
   border=""
-  class="bg-surface-100-800-token hidden h-full md:block ">
+  class="bg-surface-100-800-token hidden h-full md:block">
   {#each links as link (link.name)}
-    <TabAnchor href={link.href} selected={$page.url.pathname === link.href}>
-      <svelte:fragment slot="lead"
-        ><div class="flex justify-center">
+    <TabAnchor
+      on:click={() => (window.location.href = link.href)}
+      selected={$page.url.pathname === link.href}>
+      <svelte:fragment slot="lead">
+        <div class="flex justify-center">
           <svelte:component this={link.icon} />
-        </div></svelte:fragment>
+        </div>
+      </svelte:fragment>
       <span>{link.name}</span>
     </TabAnchor>
   {/each}

@@ -1,129 +1,184 @@
 <script lang="ts">
-  import { onMount, setContext } from "svelte";
+  import { onDestroy, onMount, setContext } from "svelte";
   import type L from "leaflet";
   import { key } from "$lib/components/map";
-
-  import "leaflet/dist/leaflet.css";
+  import { modeCurrent } from "@skeletonlabs/skeleton";
 
   export let mapLat: number;
   export let mapLon: number;
-  export let senderLat: number;
-  export let senderLon: number;
-  export let receiverLat: number;
-  export let receiverLon: number;
   export let zoom: number;
 
   let leaflet: typeof L;
   let leafletMap: L.Map;
   let mapEl: HTMLDivElement;
+  let baseLayer: L.TileLayer;
+  let observer: MutationObserver;
 
   setContext(key, {
     getLeaflet: () => leaflet,
     getMap: () => leafletMap,
   });
 
+  const baseLayers = {
+    light: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+    dark: "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+  };
+
+  const baseLayerAttribution = {
+    light:
+      '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+    dark: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+  };
+
+  $: if (leafletMap && baseLayer) {
+    const currentTheme = $modeCurrent === false ? "dark" : "light";
+    const url = baseLayers[currentTheme];
+    const attribution = baseLayerAttribution[currentTheme];
+
+    const newLayer = leaflet.tileLayer(url, {
+      minZoom: 2,
+      maxZoom: 20,
+      attribution,
+    });
+
+    leafletMap.addLayer(newLayer);
+    leafletMap.removeLayer(baseLayer);
+    baseLayer = newLayer;
+
+    // Reapply zoom control styles when the theme changes (otherwise they won't be applied)
+    styleZoomControls();
+  }
+
+  /**
+   * Styles the Leaflet zoom control buttons based on the current theme.
+   *
+   * - Applies background color, text color, and border styles dynamically
+   *   depending on whether dark mode or light mode is active.
+   * - Ensures buttons and their container have consistent styling for usability
+   *   and theme alignment.
+   * - Runs after a short timeout to ensure the DOM elements are available
+   *   for manipulation.
+   */
+  function styleZoomControls() {
+    setTimeout(() => {
+      const zoomControls = document.querySelectorAll(".leaflet-control-zoom");
+
+      zoomControls.forEach((control) => {
+        if (control instanceof HTMLElement) {
+          const isDarkMode = $modeCurrent === false;
+          control.style.backgroundColor = isDarkMode
+            ? "rgba(50, 50, 50, 0.8)"
+            : "rgba(255, 255, 255, 0.8)";
+          control.style.borderRadius = "5px";
+          control.style.padding = "5px";
+
+          const buttons = control.querySelectorAll(
+            ".leaflet-control-zoom-in, .leaflet-control-zoom-out",
+          );
+          buttons.forEach((button) => {
+            if (button instanceof HTMLElement) {
+              button.style.backgroundColor = isDarkMode ? "#333" : "#fff";
+              button.style.color = isDarkMode ? "#fff" : "#333";
+              button.style.border = isDarkMode
+                ? "1px solid #666"
+                : "1px solid #ccc";
+              button.style.borderRadius = "3px";
+              button.style.width = "30px";
+              button.style.height = "30px";
+              button.style.lineHeight = "30px";
+              button.style.textAlign = "center";
+              button.style.cursor = "pointer";
+            }
+          });
+        }
+      });
+    }, 0);
+  }
+
+  /**
+   * Applies a dark theme filter to Leaflet map tiles based on the current theme.
+   *
+   * - Adds a CSS filter to map tiles for dark mode to invert colors and adjust hue.
+   * - Restores default appearance for tiles in light mode.
+   * - Targets all elements with the `.leaflet-tile` class within the map container.
+   */
+  function applyTileFilter() {
+    const isDarkMode = $modeCurrent === false;
+    const mapTiles = document.querySelectorAll(".leaflet-tile");
+
+    mapTiles.forEach((tile) => {
+      if (tile instanceof HTMLElement) {
+        tile.style.filter = isDarkMode
+          ? "hue-rotate(185deg) invert(100%)"
+          : "none";
+      }
+    });
+  }
+
+  /**
+   * Observes changes to the map container's DOM and applies the theme filter
+   * to newly added map tiles.
+   *
+   * - Monitors for new `.leaflet-tile` elements being added or removed.
+   * - Ensures the dark theme filter is applied to any dynamically loaded tiles.
+   * - Disconnects any previous observer before starting a new one to avoid duplication.
+   */
+  function observeTileChanges() {
+    if (observer) observer.disconnect(); // Clean up previous observer, if any
+
+    observer = new MutationObserver(() => {
+      applyTileFilter(); // Apply the filter whenever a new tile is added
+    });
+
+    observer.observe(mapEl, {
+      childList: true,
+      subtree: true, // Observe `.leaflet-tile` changes within the map
+    });
+  }
+
+  $: {
+    if (leafletMap) {
+      applyTileFilter();
+      observeTileChanges();
+      styleZoomControls();
+    }
+  }
+
   onMount(async () => {
     leaflet = await import("leaflet");
 
     leafletMap = leaflet
       .map(mapEl, {
+        maxBoundsViscosity: 1.0,
         zoomControl: true,
       })
       .setView([mapLat, mapLon], zoom);
 
-    leaflet
-      .tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        minZoom: 0,
-        maxZoom: 20,
-        attribution:
-          '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-      })
-      .addTo(leafletMap);
+    var southWest = leaflet.latLng(-89.98155760646617, -180),
+      northEast = leaflet.latLng(89.99346179538875, 180);
+    var bounds = leaflet.latLngBounds(southWest, northEast);
 
+    leafletMap.setMaxBounds(bounds);
+    leafletMap.on("drag", function () {
+      leafletMap.panInsideBounds(bounds, { animate: false });
+    });
+
+    const initialTheme = $modeCurrent === false ? "dark" : "light";
+    baseLayer = leaflet.tileLayer(baseLayers[initialTheme], {
+      minZoom: 2,
+      maxZoom: 20,
+      attribution: baseLayerAttribution[initialTheme],
+    });
+
+    baseLayer.addTo(leafletMap);
     leafletMap.attributionControl.setPrefix(false);
 
-    // Function to calculate the number of intermediary points based on distance
-    function calculateNumberOfPoints(
-      startLat: number,
-      startLon: number,
-      endLat: number,
-      endLon: number,
-    ): number {
-      const R = 6371; // Radius of the Earth in kilometers
-      const dLat = ((endLat - startLat) * Math.PI) / 180;
-      const dLon = ((endLon - startLon) * Math.PI) / 180;
-      const a =
-        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.cos((startLat * Math.PI) / 180) *
-          Math.cos((endLat * Math.PI) / 180) *
-          Math.sin(dLon / 2) *
-          Math.sin(dLon / 2);
-      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-      const distance = R * c; // Distance in kilometers
+    styleZoomControls(); // Style the zoom controls after mounting
+  });
 
-      // Adjust the number of points based on the distance
-      if (distance < 50) return 5; // Short distance
-      if (distance < 200) return 20; // Medium distance
-      if (distance < 1000) return 50; // Long distance
-      return 100; // Very long distance
-    }
-
-    // Function to generate random intermediary points
-    function generateIntermediaryPoints(
-      startLat: number,
-      startLon: number,
-      endLat: number,
-      endLon: number,
-      numberOfPoints: number,
-    ): [number, number][] {
-      const points: [number, number][] = [];
-      const latDiff = endLat - startLat;
-      const lonDiff = endLon - startLon;
-
-      for (let i = 1; i <= numberOfPoints; i++) {
-        const factor = i / (numberOfPoints + 1);
-        const randomLat =
-          startLat + latDiff * factor + (Math.random() - 0.5) * 0.1; // Small random adjustment
-        const randomLon =
-          startLon + lonDiff * factor + (Math.random() - 0.5) * 0.1; // Small random adjustment
-        points.push([randomLat, randomLon]);
-      }
-      return points;
-    }
-
-    // Calculate the number of points based on distance
-    const numberOfPoints = calculateNumberOfPoints(
-      senderLat,
-      senderLon,
-      receiverLat,
-      receiverLon,
-    );
-
-    // Generate intermediary points
-    const intermediaryPoints = generateIntermediaryPoints(
-      senderLat,
-      senderLon,
-      receiverLat,
-      receiverLon,
-      numberOfPoints,
-    );
-
-    // Combine all points to form a polyline
-    const route = leaflet.polyline(
-      [
-        [senderLat, senderLon],
-        ...intermediaryPoints,
-        [receiverLat, receiverLon],
-      ],
-      {
-        color: "orange", // Color of the line
-        weight: 4, // Line thickness
-        opacity: 0.7, // Line opacity
-      },
-    );
-
-    // Add the polyline to the map
-    route.addTo(leafletMap);
+  // Clean up observer when the component is destroyed
+  onDestroy(() => {
+    if (observer) observer.disconnect();
   });
 </script>
 
@@ -134,10 +189,15 @@
 {/if}
 
 <style scoped>
+  @import "https://unpkg.com/leaflet@1.7.1/dist/leaflet.css";
+
   .map {
     position: absolute;
-    inset: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
     z-index: 1;
-    border-radius: 0.75rem;
+    border-radius: inherit;
   }
 </style>
